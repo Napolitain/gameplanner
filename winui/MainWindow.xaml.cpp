@@ -22,15 +22,17 @@ namespace winrt::GamePlannerApp::implementation
     {
         games_ = GameFactory::CreateAllGames();
         
-        // Create a collection for the ListView
+        // TODO: Create a collection for the ListView
+        // This is a placeholder implementation that requires proper WinRT wrapper classes
+        // In a complete implementation, create custom WinRT classes that wrap Game objects
+        // and expose properties for data binding (Name, Description, etc.)
         auto gamesList = winrt::single_threaded_observable_vector<IInspectable>();
         
         for (const auto& game : games_)
         {
-            // Create a simple object to bind to XAML
+            // TODO: Replace with proper WinRT wrapper class
+            // Example: auto gameItem = winrt::make<GameViewModel>(game);
             auto gameItem = winrt::make<winrt::Windows::Foundation::IPropertyValue>();
-            // Note: In a real implementation, we would create proper WinRT objects
-            // For now, this demonstrates the structure
             gamesList.Append(gameItem);
         }
         
@@ -56,12 +58,14 @@ namespace winrt::GamePlannerApp::implementation
         );
         filteredItems_ = currentItems_;
         
-        // Create a collection for the items
+        // TODO: Create a collection for the items with proper data binding
+        // This requires custom WinRT wrapper classes for GameItem
         auto itemsList = winrt::single_threaded_observable_vector<IInspectable>();
         
         for (const auto& item : filteredItems_)
         {
-            // In a real implementation, wrap GameItem in a WinRT object
+            // TODO: Replace with proper WinRT wrapper class
+            // Example: auto wrappedItem = winrt::make<GameItemViewModel>(item);
             auto wrappedItem = winrt::make<winrt::Windows::Foundation::IPropertyValue>();
             itemsList.Append(wrappedItem);
         }
@@ -217,7 +221,8 @@ namespace winrt::GamePlannerApp::implementation
             
             for (const auto& item : currentItems_)
             {
-                std::wstring itemName = winrt::to_hstring(item->GetName()).c_str();
+                // Convert to wstring once for comparison
+                std::wstring itemName = winrt::to_hstring(item->GetName());
                 std::transform(itemName.begin(), itemName.end(), itemName.begin(), ::towlower);
                 
                 if (itemName.find(lowerSearch) != std::wstring::npos)
@@ -227,6 +232,7 @@ namespace winrt::GamePlannerApp::implementation
             }
         }
         
+        // TODO: Optimize this to only update the ItemsSource instead of rebuilding the entire list
         LoadItems(currentGame_);
     }
 }
