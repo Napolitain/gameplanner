@@ -13,6 +13,8 @@ mod build_order_tests;
 mod chess_tests;
 #[cfg(test)]
 mod game_tests;
+#[cfg(test)]
+mod fory_tests;
 
 pub use build_order::{BuildOrder, BuildOrderStep};
 pub use chess::ChessGame;
