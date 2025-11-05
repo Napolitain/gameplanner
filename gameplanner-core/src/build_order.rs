@@ -1,10 +1,12 @@
 use crate::game::GameItem;
+use fory::ForyObject;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 /// Represents a single step in a build order/action sequence
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, ForyObject)]
 pub struct BuildOrderStep {
-    pub step_number: usize,
+    pub step_number: i32,
     pub item: Arc<GameItem>,
     pub notes: String,
 }
@@ -12,7 +14,7 @@ pub struct BuildOrderStep {
 impl BuildOrderStep {
     pub fn new(step_number: usize, item: Arc<GameItem>) -> Self {
         Self {
-            step_number,
+            step_number: step_number as i32,
             item,
             notes: String::new(),
         }
@@ -25,7 +27,7 @@ impl BuildOrderStep {
 }
 
 /// Represents a complete action sequence/build order
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, ForyObject)]
 pub struct BuildOrder {
     pub name: String,
     pub steps: Vec<BuildOrderStep>,
@@ -71,7 +73,7 @@ impl BuildOrder {
 
     fn renumber_steps(&mut self) {
         for (i, step) in self.steps.iter_mut().enumerate() {
-            step.step_number = i + 1;
+            step.step_number = (i + 1) as i32;
         }
     }
 
