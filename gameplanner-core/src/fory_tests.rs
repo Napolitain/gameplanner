@@ -5,10 +5,27 @@ mod tests {
     use fory::Fory;
     use std::sync::Arc;
 
+    // Type IDs for Fory registration - must be unique across the application
+    const RESOURCE_TYPE_ID: u32 = 1;
+    const GAME_ITEM_TYPE_ID: u32 = 2;
+    const BUILD_ORDER_STEP_TYPE_ID: u32 = 3;
+    const BUILD_ORDER_TYPE_ID: u32 = 4;
+    const GAME_TYPE_ID: u32 = 5;
+
+    /// Helper function to create a Fory instance with all types registered
+    fn setup_fory() -> Result<Fory, Box<dyn std::error::Error>> {
+        let mut fory = Fory::default();
+        fory.register::<Resource>(RESOURCE_TYPE_ID)?;
+        fory.register::<GameItem>(GAME_ITEM_TYPE_ID)?;
+        fory.register::<BuildOrderStep>(BUILD_ORDER_STEP_TYPE_ID)?;
+        fory.register::<BuildOrder>(BUILD_ORDER_TYPE_ID)?;
+        fory.register::<Game>(GAME_TYPE_ID)?;
+        Ok(fory)
+    }
+
     #[test]
     fn test_resource_fory_serialization() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         let resource = Resource::new("Minerals", 100.0);
         
@@ -24,9 +41,7 @@ mod tests {
 
     #[test]
     fn test_game_item_fory_serialization() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
-        fory.register::<GameItem>(2).expect("Failed to register GameItem");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         let item = GameItem::new("e4", "e4", "Opening")
             .with_description("King's pawn opening")
@@ -51,10 +66,7 @@ mod tests {
 
     #[test]
     fn test_game_fory_serialization() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
-        fory.register::<GameItem>(2).expect("Failed to register GameItem");
-        fory.register::<Game>(3).expect("Failed to register Game");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         let mut game = Game::new("chess", "Chess")
             .with_description("Classic chess game");
@@ -75,11 +87,7 @@ mod tests {
 
     #[test]
     fn test_build_order_fory_serialization() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
-        fory.register::<GameItem>(2).expect("Failed to register GameItem");
-        fory.register::<BuildOrderStep>(3).expect("Failed to register BuildOrderStep");
-        fory.register::<BuildOrder>(4).expect("Failed to register BuildOrder");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         let item1 = Arc::new(GameItem::new("e4", "e4", "Opening"));
         let item2 = Arc::new(GameItem::new("e5", "e5", "Response"));
@@ -102,10 +110,7 @@ mod tests {
 
     #[test]
     fn test_build_order_step_fory_serialization() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
-        fory.register::<GameItem>(2).expect("Failed to register GameItem");
-        fory.register::<BuildOrderStep>(3).expect("Failed to register BuildOrderStep");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         let item = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));
         let step = BuildOrderStep::new(1, item)
@@ -124,11 +129,7 @@ mod tests {
 
     #[test]
     fn test_complex_build_order_with_shared_items() {
-        let mut fory = Fory::default();
-        fory.register::<Resource>(1).expect("Failed to register Resource");
-        fory.register::<GameItem>(2).expect("Failed to register GameItem");
-        fory.register::<BuildOrderStep>(3).expect("Failed to register BuildOrderStep");
-        fory.register::<BuildOrder>(4).expect("Failed to register BuildOrder");
+        let mut fory = setup_fory().expect("Failed to setup Fory");
         
         // Create items that will be shared across multiple steps
         let opening = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));

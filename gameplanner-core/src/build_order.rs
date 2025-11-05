@@ -12,6 +12,11 @@ pub struct BuildOrderStep {
 }
 
 impl BuildOrderStep {
+    /// Creates a new build order step
+    /// 
+    /// Note: `step_number` is accepted as `usize` for ergonomics but stored as `i32`
+    /// internally for Apache Fory serialization compatibility (Fory 0.13.0 doesn't support
+    /// unsigned integer types like usize/u32 yet).
     pub fn new(step_number: usize, item: Arc<GameItem>) -> Self {
         Self {
             step_number: step_number as i32,
