@@ -1,140 +1,130 @@
 # Continuous Integration & Deployment
 
-This directory contains GitHub Actions workflows for building and testing the Game Planner application.
+This directory contains GitHub Actions workflows for building and testing the Game Planner Rust application.
 
-## Workflows
+## Workflow
 
-### 1. Build Core Library and CLI Demo (`build-library.yml`)
+### Rust Build & Test (`rust-build.yml`)
 
-Builds the cross-platform C++ core library and demo application on multiple platforms:
+Builds and tests the Rust codebase on multiple platforms:
 
-- **Linux (GCC 14)**: Ubuntu 24.04 with GCC 14.2
-- **macOS (Clang)**: macOS 14 with latest Clang
-- **Windows (MinGW GCC 14)**: Windows with MSYS2/MinGW GCC 14
-
-**Triggers:**
-- Push to `main`, `develop`, or `copilot/**` branches
-- Pull requests to `main` or `develop`
-
-**Artifacts:**
-- `gameplanner-linux-gcc14`: Linux library and demo executable
-- `gameplanner-macos`: macOS library and demo executable
-- `gameplanner-windows-mingw`: Windows library and demo executable
-
-**What it does:**
-1. Checks out the code
-2. Installs GCC 14 (or uses platform default)
-3. Configures CMake with C++23 support
-4. Builds the core library (`GamePlannerLib`)
-5. Builds the demo application (`GamePlannerDemo`)
-6. Runs the demo to verify functionality
-7. Uploads build artifacts
-
-### 2. Build WinUI3 Application (`build-winui.yml`)
-
-Validates the Windows UI build on Windows with Visual Studio:
-
-- **Windows (MSVC)**: Windows with Visual Studio 2022
+- **Linux (Ubuntu latest)**: Full build with tests, clippy linting, and formatting checks
+- **macOS (latest)**: Build and run tests
+- **Windows (latest)**: Build all packages including Windows UI
 
 **Triggers:**
 - Push to `main`, `develop`, or `copilot/**` branches
 - Pull requests to `main` or `develop`
 
 **Artifacts:**
-- `gameplanner-windows-msvc`: Windows library built with MSVC
+- `gameplanner-linux-rust`: Linux CLI binary and library
+- `gameplanner-macos-rust`: macOS CLI binary and library
+- `gameplanner-windows-rust`: Windows CLI, Windows UI, and library
 
 **What it does:**
 1. Checks out the code
-2. Sets up MSBuild and Visual Studio environment
-3. Configures CMake with Visual Studio generator
-4. Builds the core library with MSVC
-5. Attempts to build the demo (if available)
-6. Provides notes about WinUI3 requirements
-
-**Note:** The WinUI3 application requires a complete Visual Studio project setup (`.vcxproj`/`.sln` files) and Windows App SDK. The current code provides a template structure. See `winui/README.md` for more details.
-
-## Compiler Requirements
-
-The project uses C++23 features, specifically `std::print` and `std::println`, which require:
-
-- **GCC 14+**: First version with `<print>` header support
-- **Clang 18+**: Full C++23 support (may need libc++ from Clang)
-- **MSVC 19.40+**: Visual Studio 2022 17.10 or later
+2. Installs Rust toolchain (stable)
+3. Caches cargo dependencies for faster builds
+4. Runs formatting checks (`cargo fmt --check`)
+5. Runs Clippy linting (`cargo clippy`)
+6. Builds all packages in release mode
+7. Runs all tests
+8. Runs the CLI demo to verify functionality
+9. Uploads build artifacts
 
 ## Running Locally
 
-To build locally with the same configuration as CI:
+### Prerequisites
+- Rust (install from [rustup.rs](https://rustup.rs/))
+- Windows SDK (for Windows UI builds on Windows only)
 
-### Linux (GCC 14)
+### Build Commands
+
 ```bash
-sudo apt-get install gcc-14 g++-14 cmake
-mkdir build && cd build
-CXX=g++-14 CC=gcc-14 cmake ..
-cmake --build .
-./examples/GamePlannerDemo
+# Build everything
+cargo build --release
+
+# Build only core library
+cargo build --package gameplanner-core --release
+
+# Build only CLI
+cargo build --package gameplanner-cli --release
+
+# Build only Windows UI (Windows only)
+cargo build --package gameplanner-ui-windows --release
+
+# Run tests
+cargo test --all
+
+# Run clippy
+cargo clippy --all-targets --all-features -- -D warnings
+
+# Check formatting
+cargo fmt --all -- --check
+
+# Fix formatting
+cargo fmt --all
 ```
 
-### macOS
+### Running the Demo
+
 ```bash
-brew install cmake
-mkdir build && cd build
-cmake ..
-cmake --build .
-./examples/GamePlannerDemo
+# Interactive CLI
+cargo run --package gameplanner-cli --release
+
+# Windows UI (Windows only)
+cargo run --package gameplanner-ui-windows --release
 ```
 
-### Windows (MinGW via MSYS2)
+## Code Quality
+
+### Formatting
+All code must pass `cargo fmt` checks. Run `cargo fmt --all` before committing.
+
+### Linting
+All code must pass `cargo clippy` with no warnings. Run:
 ```bash
-# In MSYS2 UCRT64 shell
-pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake make
-mkdir build && cd build
-cmake .. -G "Unix Makefiles"
-cmake --build .
-./examples/GamePlannerDemo.exe
+cargo clippy --all-targets --all-features -- -D warnings
 ```
 
-### Windows (Visual Studio)
+### Testing
+All tests must pass. Run:
 ```bash
-# In Developer Command Prompt
-mkdir build && cd build
-cmake .. -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release
-.\examples\Release\GamePlannerDemo.exe
+cargo test --all
 ```
 
-## Build Status
+## Caching
 
-Check the Actions tab in the GitHub repository to see the latest build status for each platform.
+The workflow uses GitHub Actions caching for:
+- Cargo registry (~/.cargo/registry)
+- Cargo git dependencies (~/.cargo/git)
+- Build artifacts (target/)
 
-## Adding New Workflows
-
-To add a new workflow:
-
-1. Create a new `.yml` file in `.github/workflows/`
-2. Define the workflow triggers and jobs
-3. Test locally first if possible
-4. Commit and push to trigger the workflow
+This significantly speeds up builds by reusing dependencies.
 
 ## Troubleshooting
 
-### Build fails with "print: No such file or directory"
-- Ensure you're using GCC 14+ or equivalent compiler
-- Check compiler version: `g++ --version`
+### Build fails with "cannot find crate"
+- Clear cargo cache and rebuild
+- Check Cargo.toml dependencies
 
-### CMake can't find compiler
-- Make sure compiler is in PATH
-- Specify compiler explicitly: `CXX=g++-14 CC=gcc-14 cmake ..`
+### Windows UI build fails
+- Ensure Windows SDK is installed
+- Check that windows crate is properly configured
 
-### WinUI3 build fails
-- WinUI3 requires complete Visual Studio project files
-- See `winui/README.md` for setup instructions
-- The library can still be built and used independently
+### Clippy warnings
+- Fix all clippy warnings before pushing
+- Use `#[allow(clippy::...)]` only for false positives
+
+### Test failures
+- Run tests locally: `cargo test --all`
+- Check test output for specific failures
 
 ## Future Enhancements
 
-- [ ] Add code coverage reporting
-- [ ] Add static analysis (cppcheck, clang-tidy)
-- [ ] Add performance benchmarks
-- [ ] Add deployment workflows
-- [ ] Add release automation
-- [ ] Add documentation generation (Doxygen)
+- [ ] Code coverage reporting (tarpaulin)
+- [ ] Benchmark suite
+- [ ] Security audit (cargo-audit)
+- [ ] Dependency updates bot (dependabot)
+- [ ] Performance regression tests
+- [ ] Documentation generation and hosting

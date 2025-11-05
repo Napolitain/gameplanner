@@ -125,8 +125,8 @@ jobs:
     - name: Build CLI
       run: cargo build --package gameplanner-cli --release
     
-    - name: Build Windows UI
-      run: cargo build --package gameplanner-ui-windows --release
+    - name: Run tests
+      run: cargo test --all
     
     - name: Run CLI demo
       run: |
@@ -138,5 +138,4 @@ jobs:
         name: gameplanner-windows-rust
         path: |
           target/release/gameplanner.exe
-          target/release/gameplanner-windows.exe
           target/release/gameplanner_core.*

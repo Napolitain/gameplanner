@@ -92,3 +92,7 @@ impl Game {
         self.items.iter().find(|item| item.id == id).cloned()
     }
 }
+
+#[cfg(test)]
+#[path = "game_tests.rs"]
+mod tests;

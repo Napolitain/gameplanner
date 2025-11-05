@@ -79,3 +79,7 @@ impl BuildOrder {
         self.steps.iter().map(|step| step.item.time_cost).sum()
     }
 }
+
+#[cfg(test)]
+#[path = "build_order_tests.rs"]
+mod tests;

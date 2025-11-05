@@ -5,8 +5,9 @@ pub struct ChessGame;
 
 impl ChessGame {
     pub fn create() -> Game {
-        let mut game = Game::new("chess", "Chess")
-            .with_description("Classic chess game - plan your move sequences and opening strategies");
+        let mut game = Game::new("chess", "Chess").with_description(
+            "Classic chess game - plan your move sequences and opening strategies",
+        );
 
         // Pawn moves
         Self::add_pawn_moves(&mut game);
@@ -228,3 +229,7 @@ impl ChessGame {
         ]
     }
 }
+
+#[cfg(test)]
+#[path = "chess_tests.rs"]
+mod tests;
