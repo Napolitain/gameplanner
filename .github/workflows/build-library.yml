@@ -1,0 +1,144 @@
+name: Build Core Library and CLI Demo
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-linux:
+    name: Build on Linux (GCC 14)
+    runs-on: ubuntu-24.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install GCC 14
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update
+        sudo apt-get install -y gcc-14 g++-14 cmake
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+    
+    - name: Verify GCC version
+      run: |
+        gcc --version
+        g++ --version
+    
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release
+    
+    - name: Run Demo
+      run: |
+        cd build/examples
+        ./GamePlannerDemo
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: gameplanner-linux-gcc14
+        path: |
+          build/lib/libGamePlannerLib.a
+          build/examples/GamePlannerDemo
+
+  build-macos:
+    name: Build on macOS (Clang)
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        brew install cmake
+    
+    - name: Verify compiler version
+      run: |
+        clang++ --version
+    
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release
+    
+    - name: Run Demo
+      run: |
+        cd build/examples
+        ./GamePlannerDemo
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: gameplanner-macos
+        path: |
+          build/lib/libGamePlannerLib.a
+          build/examples/GamePlannerDemo
+
+  build-windows-mingw:
+    name: Build on Windows (MinGW GCC 14)
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup MSYS2 with GCC 14
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: >-
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-cmake
+          make
+    
+    - name: Verify GCC version
+      shell: msys2 {0}
+      run: |
+        gcc --version
+        g++ --version
+    
+    - name: Configure CMake
+      shell: msys2 {0}
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      shell: msys2 {0}
+      run: |
+        cd build
+        cmake --build . --config Release
+    
+    - name: Run Demo
+      shell: msys2 {0}
+      run: |
+        cd build/examples
+        ./GamePlannerDemo.exe
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: gameplanner-windows-mingw
+        path: |
+          build/lib/libGamePlannerLib.a
+          build/examples/GamePlannerDemo.exe

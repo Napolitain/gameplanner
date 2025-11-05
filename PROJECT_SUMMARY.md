@@ -47,9 +47,9 @@ gameplanner/
 ## Technology Stack
 
 ### Core Library
-- **Language**: C++23
+- **Language**: C++23 (uses `std::print` and `std::println`)
 - **Build System**: CMake 3.20+
-- **Dependencies**: Standard library only (uses std::format)
+- **Dependencies**: Standard library only
 - **Platforms**: Windows, Linux, macOS
 
 ### Windows UI
@@ -260,7 +260,7 @@ See `docs/ADDING_GAMES.md` to get started with game additions.
 ## Dependencies
 
 ### Core Library
-- C++23 standard library (uses std::format, no external dependencies)
+- C++23 standard library with `<print>` support (requires GCC 14+ or equivalent)
 
 ### WinUI3 Application
 - Windows SDK 10.0.19041.0+

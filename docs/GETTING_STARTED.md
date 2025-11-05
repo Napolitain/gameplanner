@@ -108,6 +108,7 @@ Steps:
 ```cpp
 #include "GamePlanner.h"
 #include "GameFactory.h"
+#include <print>
 
 int main() {
     // Load games
@@ -131,9 +132,9 @@ int main() {
     
     // Access the build order
     for (const auto& step : myBuild.GetSteps()) {
-        std::cout << std::format("{}. {}\n", 
-                                 step->GetStepNumber(), 
-                                 step->GetItem()->GetName());
+        std::println("{}. {}", 
+                     step->GetStepNumber(), 
+                     step->GetItem()->GetName());
     }
     
     return 0;
@@ -193,12 +194,12 @@ gameplanner/
 
 ### Build Fails with C++23 Errors
 
-**Problem**: Compiler doesn't support C++23
+**Problem**: Compiler doesn't support C++23 or `<print>` header
 
 **Solution**: Update your compiler:
-- GCC 13+ 
-- Clang 16+
-- MSVC (Visual Studio 2022)
+- GCC 14+ (for `<print>` support)
+- Clang 18+ (for full C++23 support)
+- MSVC (Visual Studio 2022 17.10+)
 
 ### WinUI3 App Won't Build
 

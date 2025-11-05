@@ -56,10 +56,10 @@ gameplanner/
 
 #### For Core Library (All Platforms)
 - CMake 3.20 or later
-- C++23 compatible compiler
-  - Windows: Visual Studio 2022
-  - Linux: GCC 13+ or Clang 16+
-  - macOS: Xcode 15+
+- C++23 compatible compiler with `<print>` support
+  - Windows: Visual Studio 2022 (17.10+) or MinGW GCC 14+
+  - Linux: GCC 14+ or Clang 18+
+  - macOS: Xcode 16+ (Apple Clang with C++23 support)
 
 #### For Windows UI
 - Windows 10 SDK (10.0.19041.0 or later)
@@ -87,6 +87,18 @@ The WinUI3 application requires Visual Studio 2022:
 4. Build and run (F5)
 
 **Note**: WinUI3 applications are best built using Visual Studio. CMake support for WinUI3 is limited.
+
+## Continuous Integration
+
+The project includes CI/CD workflows that automatically build and test on:
+- **Linux**: GCC 14 on Ubuntu 24.04
+- **macOS**: Latest Clang on macOS 14
+- **Windows**: MinGW GCC 14 and MSVC (Visual Studio 2022)
+
+See [`.github/workflows/README.md`](.github/workflows/README.md) for details.
+
+[![Build Core Library](../../actions/workflows/build-library.yml/badge.svg)](../../actions/workflows/build-library.yml)
+[![Build WinUI3](../../actions/workflows/build-winui.yml/badge.svg)](../../actions/workflows/build-winui.yml)
 
 ## Architecture
 
