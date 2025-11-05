@@ -20,6 +20,12 @@ CMakeFiles/
 cmake_install.cmake
 install_manifest.txt
 
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
 # OS specific
 .DS_Store
 Thumbs.db

@@ -1,0 +1,14 @@
+[package]
+name = "gameplanner-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "gameplanner"
+path = "src/main.rs"
+
+[dependencies]
+gameplanner-core = { path = "../gameplanner-core" }
+serde_json.workspace = true

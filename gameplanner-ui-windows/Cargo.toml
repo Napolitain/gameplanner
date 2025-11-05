@@ -1,0 +1,17 @@
+[package]
+name = "gameplanner-ui-windows"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "gameplanner-windows"
+path = "src/main.rs"
+
+[dependencies]
+gameplanner-core = { path = "../gameplanner-core" }
+windows.workspace = true
+
+[target.'cfg(windows)'.build-dependencies]
+embed-resource = "2.4"
