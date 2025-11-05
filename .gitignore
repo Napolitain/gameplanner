@@ -1,0 +1,34 @@
+# Build directories
+build/
+out/
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Generated files
+*.vcxproj.filters
+*.vcxproj.user
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Dependencies
+packages/
