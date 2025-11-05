@@ -131,8 +131,9 @@ int main() {
     
     // Access the build order
     for (const auto& step : myBuild.GetSteps()) {
-        std::cout << step->GetStepNumber() << ". " 
-                  << step->GetItem()->GetName() << std::endl;
+        std::cout << std::format("{}. {}\n", 
+                                 step->GetStepNumber(), 
+                                 step->GetItem()->GetName());
     }
     
     return 0;
@@ -190,13 +191,13 @@ gameplanner/
 - Linux: Install GCC (`sudo apt install g++`)
 - macOS: Install Xcode Command Line Tools
 
-### Build Fails with C++20 Errors
+### Build Fails with C++23 Errors
 
-**Problem**: Compiler doesn't support C++20
+**Problem**: Compiler doesn't support C++23
 
 **Solution**: Update your compiler:
-- GCC 10+ 
-- Clang 12+
+- GCC 13+ 
+- Clang 16+
 - MSVC (Visual Studio 2022)
 
 ### WinUI3 App Won't Build

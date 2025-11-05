@@ -266,7 +266,7 @@ After adding Age of Empires II, you can create build orders like:
 - Ensure description is helpful
 
 ### Build Fails
-- Make sure you're using C++20 features correctly
+- Make sure you're using C++23 features correctly
 - Check for typos in function names
 - Verify all includes are present
 

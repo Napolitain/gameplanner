@@ -254,7 +254,7 @@ CMakeLists.txt (root)
 - **GamePlannerApp**: WinUI3 Windows application (requires VS)
 
 ### Dependencies
-- **Core Library**: C++20 standard library only
+- **Core Library**: C++23 standard library only (uses std::format)
 - **WinUI3 App**: Windows SDK, WinRT, Windows App SDK
 
 ## Future Directions

@@ -1,28 +1,28 @@
 #include "GamePlanner.h"
 #include "GameFactory.h"
+#include <format>
 #include <iostream>
-#include <iomanip>
 
 using namespace gameplanner;
 
 void printGame(const std::shared_ptr<Game>& game) {
-    std::cout << "\n=== " << game->GetName() << " ===" << std::endl;
-    std::cout << game->GetDescription() << std::endl;
-    std::cout << "\nAvailable Items (" << game->GetItems().size() << " total):" << std::endl;
+    std::cout << std::format("\n=== {} ===\n", game->GetName());
+    std::cout << std::format("{}\n", game->GetDescription());
+    std::cout << std::format("\nAvailable Items ({} total):\n", game->GetItems().size());
     
     for (const auto& item : game->GetItems()) {
-        std::cout << "\n  " << item->GetName();
         if (!item->GetCategory().empty()) {
-            std::cout << " [" << item->GetCategory() << "]";
+            std::cout << std::format("\n  {} [{}]\n", item->GetName(), item->GetCategory());
+        } else {
+            std::cout << std::format("\n  {}\n", item->GetName());
         }
-        std::cout << std::endl;
         
         if (!item->GetDescription().empty()) {
-            std::cout << "    " << item->GetDescription() << std::endl;
+            std::cout << std::format("    {}\n", item->GetDescription());
         }
         
         if (item->GetBuildTime() > 0) {
-            std::cout << "    Build Time: " << item->GetBuildTime() << "s" << std::endl;
+            std::cout << std::format("    Build Time: {}s\n", item->GetBuildTime());
         }
         
         if (!item->GetCosts().empty()) {
@@ -30,15 +30,15 @@ void printGame(const std::shared_ptr<Game>& game) {
             for (size_t i = 0; i < item->GetCosts().size(); ++i) {
                 if (i > 0) std::cout << ", ";
                 const auto& cost = item->GetCosts()[i];
-                std::cout << cost.amount << " " << cost.name;
+                std::cout << std::format("{} {}", cost.amount, cost.name);
             }
-            std::cout << std::endl;
+            std::cout << '\n';
         }
     }
 }
 
 void demonstrateBuildOrder(const std::shared_ptr<Game>& game) {
-    std::cout << "\n\n=== Sample Build Order for " << game->GetName() << " ===" << std::endl;
+    std::cout << std::format("\n\n=== Sample Build Order for {} ===\n", game->GetName());
     
     BuildOrder buildOrder("Opening Build");
     
@@ -85,39 +85,38 @@ void demonstrateBuildOrder(const std::shared_ptr<Game>& game) {
         }
     }
     
-    std::cout << "\nBuild Order: " << buildOrder.GetName() << std::endl;
-    std::cout << "Total Steps: " << buildOrder.GetSteps().size() << std::endl;
-    std::cout << "\nSteps:" << std::endl;
+    std::cout << std::format("\nBuild Order: {}\n", buildOrder.GetName());
+    std::cout << std::format("Total Steps: {}\n", buildOrder.GetSteps().size());
+    std::cout << "\nSteps:\n";
     
     for (const auto& step : buildOrder.GetSteps()) {
         const auto& item = step->GetItem();
-        std::cout << "  " << std::setw(2) << step->GetStepNumber() << ". ";
-        std::cout << item->GetName();
+        std::cout << std::format("  {:2}. {}", step->GetStepNumber(), item->GetName());
         
         if (!item->GetCosts().empty()) {
             std::cout << " (";
             for (size_t i = 0; i < item->GetCosts().size(); ++i) {
                 if (i > 0) std::cout << ", ";
                 const auto& cost = item->GetCosts()[i];
-                std::cout << cost.amount << " " << cost.name;
+                std::cout << std::format("{} {}", cost.amount, cost.name);
             }
             std::cout << ")";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 }
 
 int main() {
-    std::cout << "==================================================" << std::endl;
-    std::cout << "    Game Planner - Build Order System Demo" << std::endl;
-    std::cout << "==================================================" << std::endl;
+    std::cout << "==================================================\n";
+    std::cout << "    Game Planner - Build Order System Demo\n";
+    std::cout << "==================================================\n";
     
     // Load all games
     auto games = GameFactory::CreateAllGames();
     
-    std::cout << "\nLoaded " << games.size() << " games:" << std::endl;
+    std::cout << std::format("\nLoaded {} games:\n", games.size());
     for (const auto& game : games) {
-        std::cout << "  - " << game->GetName() << std::endl;
+        std::cout << std::format("  - {}\n", game->GetName());
     }
     
     // Print details for each game
@@ -130,9 +129,9 @@ int main() {
         demonstrateBuildOrder(game);
     }
     
-    std::cout << "\n\n==================================================" << std::endl;
-    std::cout << "Demo completed successfully!" << std::endl;
-    std::cout << "==================================================" << std::endl;
+    std::cout << "\n\n==================================================\n";
+    std::cout << "Demo completed successfully!\n";
+    std::cout << "==================================================\n";
     
     return 0;
 }

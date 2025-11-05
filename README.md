@@ -56,10 +56,10 @@ gameplanner/
 
 #### For Core Library (All Platforms)
 - CMake 3.20 or later
-- C++20 compatible compiler
+- C++23 compatible compiler
   - Windows: Visual Studio 2022
-  - Linux: GCC 10+ or Clang 12+
-  - macOS: Xcode 13+
+  - Linux: GCC 13+ or Clang 16+
+  - macOS: Xcode 15+
 
 #### For Windows UI
 - Windows 10 SDK (10.0.19041.0 or later)
