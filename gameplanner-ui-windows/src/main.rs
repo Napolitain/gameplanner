@@ -11,11 +11,8 @@ mod windows_ui {
     use std::cell::RefCell;
     use std::rc::Rc;
     use windows::{
-        core::*,
-        Win32::Foundation::*,
-        Win32::Graphics::Gdi::*,
-        Win32::System::LibraryLoader::GetModuleHandleW,
-        Win32::UI::Controls::*,
+        core::*, Win32::Foundation::*, Win32::Graphics::Gdi::*,
+        Win32::System::LibraryLoader::GetModuleHandleW, Win32::UI::Controls::*,
         Win32::UI::WindowsAndMessaging::*,
     };
 
@@ -100,7 +97,7 @@ mod windows_ui {
                 // Initialize app state
                 let state = Box::new(RefCell::new(AppState::new()));
                 SetWindowLongPtrW(hwnd, GWLP_USERDATA, Box::into_raw(state) as _);
-                
+
                 // Post message to create controls after window is fully created
                 PostMessageW(hwnd, WM_CREATE_CONTROLS, WPARAM(0), LPARAM(0)).ok();
                 LRESULT(0)
