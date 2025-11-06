@@ -25,9 +25,11 @@ Game Planner helps strategy game players create, manage, and optimize action seq
 - **Cross-platform**: Works on Linux, macOS, and Windows
 
 ### Windows UI (`gameplanner-ui-windows`)
-- **Native Win32 API**: Using the `windows` crate
-- **Simple visualization**: Display available moves and current sequence
-- **Lightweight**: No heavy framework dependencies
+- **Native Win32 API**: Using the latest `windows` crate v0.58
+- **Visual interface**: List view for available moves and build order
+- **Interactive controls**: Add, remove, and clear buttons
+- **Lightweight**: Direct Win32 API with no heavy framework dependencies
+- **Windows-only**: Optional binary that only builds on Windows
 
 ## Project Structure
 
