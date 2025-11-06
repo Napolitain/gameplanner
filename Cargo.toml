@@ -14,5 +14,7 @@ license = "MIT"
 
 [workspace.dependencies]
 # Core dependencies
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
+fory = "0.13.0"
+fory-core = "0.13.0"

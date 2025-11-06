@@ -1,8 +1,9 @@
+use fory::ForyObject;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 /// Represents a resource type (e.g., time, material cost)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ForyObject)]
 pub struct Resource {
     pub name: String,
     pub amount: f64,
@@ -18,7 +19,7 @@ impl Resource {
 }
 
 /// Represents a single action/move that can be performed in a game
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ForyObject)]
 pub struct GameItem {
     pub id: String,
     pub name: String,
@@ -61,7 +62,7 @@ impl GameItem {
 }
 
 /// Represents a game with its rules and available actions
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, ForyObject)]
 pub struct Game {
     pub id: String,
     pub name: String,
