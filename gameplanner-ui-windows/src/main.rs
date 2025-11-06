@@ -7,14 +7,23 @@
 
 #[cfg(windows)]
 mod windows_ui {
-    use gameplanner_core::{BuildOrder, ChessGame, Game, GameItem};
+    use gameplanner_core::{BuildOrder, ChessGame, Game};
     use std::cell::RefCell;
-    use std::rc::Rc;
     use windows::{
         core::*, Win32::Foundation::*, Win32::Graphics::Gdi::*,
-        Win32::System::LibraryLoader::GetModuleHandleW, Win32::UI::Controls::*,
-        Win32::UI::WindowsAndMessaging::*,
+        Win32::System::LibraryLoader::GetModuleHandleW, Win32::UI::WindowsAndMessaging::*,
     };
+
+    // Helper macros for extracting low and high words
+    #[inline]
+    fn loword(l: u32) -> u16 {
+        (l & 0xffff) as u16
+    }
+
+    #[inline]
+    fn hiword(l: u32) -> u16 {
+        ((l >> 16) & 0xffff) as u16
+    }
 
     const WM_CREATE_CONTROLS: u32 = WM_USER + 1;
     const ID_LISTVIEW_ITEMS: i32 = 1001;
@@ -39,8 +48,8 @@ mod windows_ui {
             Self {
                 game: ChessGame::create(),
                 build_order: BuildOrder::new("My Build Order"),
-                hwnd_items_list: HWND(0),
-                hwnd_build_order_list: HWND(0),
+                hwnd_items_list: HWND(std::ptr::null_mut()),
+                hwnd_build_order_list: HWND(std::ptr::null_mut()),
             }
         }
     }
@@ -54,7 +63,7 @@ mod windows_ui {
             hInstance: instance.into(),
             lpszClassName: class_name,
             hCursor: LoadCursorW(None, IDC_ARROW)?,
-            hbrBackground: HBRUSH((COLOR_WINDOW.0 + 1) as isize),
+            hbrBackground: HBRUSH((COLOR_WINDOW.0 + 1) as *mut _),
             ..Default::default()
         };
 
@@ -108,7 +117,7 @@ mod windows_ui {
                 LRESULT(0)
             }
             WM_COMMAND => {
-                let command_id = LOWORD(wparam.0 as u32) as i32;
+                let command_id = loword(wparam.0 as u32) as i32;
                 match command_id {
                     ID_BUTTON_ADD => handle_add_item(hwnd),
                     ID_BUTTON_REMOVE => handle_remove_item(hwnd),
@@ -118,7 +127,7 @@ mod windows_ui {
                 LRESULT(0)
             }
             WM_SIZE => {
-                resize_controls(hwnd, LOWORD(lparam.0 as u32), HIWORD(lparam.0 as u32));
+                resize_controls(hwnd, loword(lparam.0 as u32), hiword(lparam.0 as u32));
                 LRESULT(0)
             }
             WM_DESTROY => {
@@ -142,7 +151,7 @@ mod windows_ui {
             WINDOW_EX_STYLE::default(),
             w!("STATIC"),
             w!("Chess Game Planner"),
-            WS_CHILD | WS_VISIBLE | WINDOW_STYLE(SS_CENTER.0 as u32),
+            WS_CHILD | WS_VISIBLE,
             10,
             10,
             860,

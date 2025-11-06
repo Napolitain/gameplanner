@@ -20,7 +20,7 @@ This document describes the visual layout of the Game Planner Windows UI.
 │  │ Nf3 - Develop knight to f3  │   └────────┘ │                      ││
 │  │ Nc3 - Develop knight to c3  │              │                      ││
 │  │ Nf6 - Develop knight to f6  │   ┌────────┐ │                      ││
-│  │ Nc6 - Develop knight to c6  │   │<< Rmove│ │                      ││
+│  │ Nc6 - Develop knight to c6  │   │<< Remove│ │                      ││
 │  │ Bc4 - Italian Game          │   └────────┘ │                      ││
 │  │ Bb5 - Ruy Lopez             │              │                      ││
 │  │ Bc5 - Develop bishop to c5  │   ┌────────┐ │                      ││
@@ -55,7 +55,7 @@ This document describes the visual layout of the Game Planner Windows UI.
 │  │ Nf3 - Develop knight to f3  │   └────────┘ │                      ││
 │  │ Nc3 - Develop knight to c3  │              │                      ││
 │  │ Nf6 - Develop knight to f6  │   ┌────────┐ │                      ││
-│  │ Nc6 - Develop knight to c6  │   │<< Rmove│ │                      ││
+│  │ Nc6 - Develop knight to c6  │   │<< Remove│ │                      ││
 │  │ Bc4 - Italian Game          │   └────────┘ │                      ││
 │  │ Bb5 - Ruy Lopez             │              │                      ││
 │  │ Bc5 - Develop bishop to c5  │   ┌────────┐ │                      ││
