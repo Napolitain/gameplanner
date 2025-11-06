@@ -2,6 +2,7 @@
 members = [
     "gameplanner-core",
     "gameplanner-cli",
+    "gameplanner-ui-windows",
 ]
 default-members = ["gameplanner-core", "gameplanner-cli"]
 resolver = "2"
