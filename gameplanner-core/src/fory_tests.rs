@@ -25,7 +25,7 @@ mod tests {
 
     #[test]
     fn test_resource_fory_serialization() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         let resource = Resource::new("Minerals", 100.0);
 
@@ -45,7 +45,7 @@ mod tests {
 
     #[test]
     fn test_game_item_fory_serialization() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         let item = GameItem::new("e4", "e4", "Opening")
             .with_description("King's pawn opening")
@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn test_game_fory_serialization() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         let mut game = Game::new("chess", "Chess").with_description("Classic chess game");
         game.add_item(GameItem::new("e4", "e4", "Opening"));
@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn test_build_order_fory_serialization() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         let item1 = Arc::new(GameItem::new("e4", "e4", "Opening"));
         let item2 = Arc::new(GameItem::new("e5", "e5", "Response"));
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_build_order_step_fory_serialization() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         let item = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));
         let step = BuildOrderStep::new(1, item).with_notes("First move");
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_complex_build_order_with_shared_items() {
-        let mut fory = setup_fory().expect("Failed to setup Fory");
+        let fory = setup_fory().expect("Failed to setup Fory");
 
         // Create items that will be shared across multiple steps
         let opening = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));
