@@ -320,8 +320,8 @@ mod windows_ui {
         .0 as isize;
 
         if selected_index >= 0 && (selected_index as usize) < state_mut.game.items.len() {
-            let item = &state_mut.game.items[selected_index as usize];
-            state_mut.build_order.add_step(item);
+            let item = state_mut.game.items[selected_index as usize].clone();
+            state_mut.build_order.add_step(item.clone());
 
             let display = format!("{}. {}", state_mut.build_order.steps.len(), item.name);
             let wide: Vec<u16> = display.encode_utf16().chain(Some(0)).collect();
