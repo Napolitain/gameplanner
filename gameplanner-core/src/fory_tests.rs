@@ -26,15 +26,19 @@ mod tests {
     #[test]
     fn test_resource_fory_serialization() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
+
         let resource = Resource::new("Minerals", 100.0);
-        
+
         // Serialize
-        let bytes = fory.serialize(&resource).expect("Failed to serialize Resource");
-        
+        let bytes = fory
+            .serialize(&resource)
+            .expect("Failed to serialize Resource");
+
         // Deserialize
-        let deserialized: Resource = fory.deserialize(&bytes).expect("Failed to deserialize Resource");
-        
+        let deserialized: Resource = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize Resource");
+
         assert_eq!(resource.name, deserialized.name);
         assert_eq!(resource.amount, deserialized.amount);
     }
@@ -42,18 +46,20 @@ mod tests {
     #[test]
     fn test_game_item_fory_serialization() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
+
         let item = GameItem::new("e4", "e4", "Opening")
             .with_description("King's pawn opening")
             .with_time_cost(1.0)
             .with_resource(Resource::new("Move", 1.0));
-        
+
         // Serialize
         let bytes = fory.serialize(&item).expect("Failed to serialize GameItem");
-        
+
         // Deserialize
-        let deserialized: GameItem = fory.deserialize(&bytes).expect("Failed to deserialize GameItem");
-        
+        let deserialized: GameItem = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize GameItem");
+
         assert_eq!(item.id, deserialized.id);
         assert_eq!(item.name, deserialized.name);
         assert_eq!(item.category, deserialized.category);
@@ -67,18 +73,19 @@ mod tests {
     #[test]
     fn test_game_fory_serialization() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
-        let mut game = Game::new("chess", "Chess")
-            .with_description("Classic chess game");
+
+        let mut game = Game::new("chess", "Chess").with_description("Classic chess game");
         game.add_item(GameItem::new("e4", "e4", "Opening"));
         game.add_item(GameItem::new("Nf3", "Nf3", "Knight Move"));
-        
+
         // Serialize
         let bytes = fory.serialize(&game).expect("Failed to serialize Game");
-        
+
         // Deserialize
-        let deserialized: Game = fory.deserialize(&bytes).expect("Failed to deserialize Game");
-        
+        let deserialized: Game = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize Game");
+
         assert_eq!(game.id, deserialized.id);
         assert_eq!(game.name, deserialized.name);
         assert_eq!(game.description, deserialized.description);
@@ -88,40 +95,50 @@ mod tests {
     #[test]
     fn test_build_order_fory_serialization() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
+
         let item1 = Arc::new(GameItem::new("e4", "e4", "Opening"));
         let item2 = Arc::new(GameItem::new("e5", "e5", "Response"));
-        
+
         let mut build_order = BuildOrder::new("Italian Game");
         build_order.add_step(item1.clone());
         build_order.add_step_with_notes(item2.clone(), "Black responds");
-        
+
         // Serialize
-        let bytes = fory.serialize(&build_order).expect("Failed to serialize BuildOrder");
-        
+        let bytes = fory
+            .serialize(&build_order)
+            .expect("Failed to serialize BuildOrder");
+
         // Deserialize
-        let deserialized: BuildOrder = fory.deserialize(&bytes).expect("Failed to deserialize BuildOrder");
-        
+        let deserialized: BuildOrder = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize BuildOrder");
+
         assert_eq!(build_order.name, deserialized.name);
         assert_eq!(build_order.steps.len(), deserialized.steps.len());
-        assert_eq!(build_order.steps[0].step_number, deserialized.steps[0].step_number);
+        assert_eq!(
+            build_order.steps[0].step_number,
+            deserialized.steps[0].step_number
+        );
         assert_eq!(build_order.steps[1].notes, deserialized.steps[1].notes);
     }
 
     #[test]
     fn test_build_order_step_fory_serialization() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
+
         let item = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));
-        let step = BuildOrderStep::new(1, item)
-            .with_notes("First move");
-        
+        let step = BuildOrderStep::new(1, item).with_notes("First move");
+
         // Serialize
-        let bytes = fory.serialize(&step).expect("Failed to serialize BuildOrderStep");
-        
+        let bytes = fory
+            .serialize(&step)
+            .expect("Failed to serialize BuildOrderStep");
+
         // Deserialize
-        let deserialized: BuildOrderStep = fory.deserialize(&bytes).expect("Failed to deserialize BuildOrderStep");
-        
+        let deserialized: BuildOrderStep = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize BuildOrderStep");
+
         assert_eq!(step.step_number, deserialized.step_number);
         assert_eq!(step.notes, deserialized.notes);
         assert_eq!(step.item.id, deserialized.item.id);
@@ -130,27 +147,31 @@ mod tests {
     #[test]
     fn test_complex_build_order_with_shared_items() {
         let mut fory = setup_fory().expect("Failed to setup Fory");
-        
+
         // Create items that will be shared across multiple steps
         let opening = Arc::new(GameItem::new("e4", "e4", "Opening").with_time_cost(1.0));
         let response = Arc::new(GameItem::new("e5", "e5", "Response").with_time_cost(1.0));
-        
+
         let mut build_order = BuildOrder::new("Test Opening");
         build_order.add_step(opening.clone());
         build_order.add_step(response.clone());
         build_order.add_step(opening.clone()); // Reuse the same item
-        
+
         // Serialize
-        let bytes = fory.serialize(&build_order).expect("Failed to serialize BuildOrder");
-        
+        let bytes = fory
+            .serialize(&build_order)
+            .expect("Failed to serialize BuildOrder");
+
         // Deserialize
-        let deserialized: BuildOrder = fory.deserialize(&bytes).expect("Failed to deserialize BuildOrder");
-        
+        let deserialized: BuildOrder = fory
+            .deserialize(&bytes)
+            .expect("Failed to deserialize BuildOrder");
+
         assert_eq!(build_order.steps.len(), deserialized.steps.len());
         assert_eq!(deserialized.steps[0].item.id, "e4");
         assert_eq!(deserialized.steps[1].item.id, "e5");
         assert_eq!(deserialized.steps[2].item.id, "e4");
-        
+
         // Verify time calculation works after deserialization
         let total_time = deserialized.total_time();
         assert_eq!(total_time, 3.0);
