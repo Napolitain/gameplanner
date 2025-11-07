@@ -97,22 +97,18 @@ export class Unit {
       return false;
     }
     
-    // No tasks means idle
-    if (this.tasks.length === 0) {
-      return true;
-    }
-    
-    // Reactor allows 2 simultaneous tasks - idle if reactor has space
-    if (this.hasReactor && this.addonTasks.length < 2) {
-      return true;
-    }
-    
     // Zerg structures with larva are considered idle if they have larva
     if (this.larvaCount > 0) {
       return true;
     }
     
-    return false;
+    // Reactor allows 2 simultaneous tasks - check if reactor has space
+    if (this.hasReactor) {
+      return this.addonTasks.length < 2;
+    }
+    
+    // For non-reactor units, idle means no tasks
+    return this.tasks.length === 0;
   }
 
   /**
@@ -199,11 +195,12 @@ export class Unit {
       this.hasChronoUntilFrame = 0;
     }
     
+    // Determine if chronoboost is active
+    const progressRate = this.hasChrono(currentFrame) ? 1.5 : 1.0;
+    
     // Update main tasks
     for (const task of this.tasks) {
       if (task) {
-        // Apply chronoboost acceleration if active
-        const progressRate = this.hasChrono(currentFrame) ? 1.5 : 1.0;
         task.progress += progressRate;
         
         // Note: Don't remove completed tasks here - GameLogic.checkCompletedTasks() 
@@ -212,16 +209,18 @@ export class Unit {
     }
     
     // Update background tasks (e.g., Zerg larva tasks)
+    // Chronoboost affects larva production from chronoboosted hatcheries
     for (const task of this.backgroundTask) {
       if (task) {
-        task.progress += 1.0;
+        task.progress += progressRate;
       }
     }
     
     // Update addon tasks (e.g., Terran reactor tasks)
+    // Chronoboost affects addon production when structure is chronoboosted
     for (const task of this.addonTasks) {
       if (task) {
-        task.progress += 1.0;
+        task.progress += progressRate;
       }
     }
   }
