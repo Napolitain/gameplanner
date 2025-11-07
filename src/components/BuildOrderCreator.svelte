@@ -3,6 +3,7 @@
   import { createBuildOrder, addStep, removeStep, clearBuildOrder, totalTime } from '../lib/buildOrder';
   import type { BuildOrder } from '../lib/buildOrder';
   import ActionBlocks from './ActionBlocks.svelte';
+  import StarCraft2Simulator from './StarCraft2Simulator.svelte';
 
   export let game: Game;
 
@@ -93,4 +94,8 @@
   </div>
 
   <ActionBlocks game={game} onActionClick={handleAddAction} />
+
+  {#if game.id === 'starcraft2'}
+    <StarCraft2Simulator game={game} buildOrder={buildOrder} />
+  {/if}
 </div>
