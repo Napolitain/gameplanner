@@ -67,7 +67,7 @@
       const events = gameLogic.eventLog.map(event => ({
         name: event.name,
         type: event.type,
-        completionTime: formatGameTime(event.endFrame)
+        completionTime: formatGameTime(event.end)
       }));
 
       simulationResults = {
