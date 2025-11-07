@@ -3,7 +3,7 @@ import { Task } from './task';
 import { Event } from './event';
 import { calculateMineralIncome, calculateVespeneIncome } from './income';
 import type { Race } from './constants';
-import { RACE_STARTING_DATA, FRAMES_PER_SECOND, UNIT_DATA } from './constants';
+import { RACE_STARTING_DATA, FRAMES_PER_SECOND, UNIT_DATA, LARVA_SPAWN_INTERVAL } from './constants';
 
 /**
  * Build order item interface
@@ -121,7 +121,7 @@ export class GameLogic {
     const townHall = new Unit(startData.townHall, this.nextUnitId++);
     if (this.race === 'Zerg') {
       townHall.larvaCount = 3;
-      townHall.nextLarvaSpawn = this.frame + 240; // 10.71 seconds
+      townHall.nextLarvaSpawn = this.frame + LARVA_SPAWN_INTERVAL;
     }
     this.units.add(townHall);
     this.idleUnits.add(townHall);
@@ -345,9 +345,15 @@ export class GameLogic {
       return false;
     }
     
-    // Find idle trainer
-    // For simplicity, just check if we have any idle units
-    if (this.idleUnits.size === 0) {
+    // Find idle trainer that can train this unit
+    // Simplified: In a full implementation, would need to:
+    // - Check unit type vs trainer type (e.g., Marines from Barracks)
+    // - Handle Zerg larva consumption
+    // - Handle Terran reactors (2 simultaneous units)
+    // - Handle Protoss probe structures (probe continues mining)
+    const firstIdle = this.idleUnits.values().next().value as Unit;
+    if (!firstIdle) {
+      this.errorMessage = 'No idle production structure available';
       return false;
     }
     
@@ -375,11 +381,8 @@ export class GameLogic {
       taskResult
     );
     
-    // Add task to first idle unit (simplified)
-    const firstIdle = this.idleUnits.values().next().value as Unit;
-    if (firstIdle) {
-      firstIdle.addTask(task);
-    }
+    // Add task to trainer
+    firstIdle.addTask(task);
     
     return true;
   }
@@ -387,9 +390,11 @@ export class GameLogic {
   /**
    * Attempt to research an upgrade
    */
-  private researchUpgrade(_name: string): boolean {
-    // Simplified - similar to trainUnit but for upgrades
-    return false; // Not implemented in this basic version
+  private researchUpgrade(name: string): boolean {
+    // Note: Upgrade system not yet implemented
+    // This is a simplified version - full implementation would require upgrade data
+    this.errorMessage = `Upgrade system not yet implemented: ${name}`;
+    return false;
   }
 
   /**

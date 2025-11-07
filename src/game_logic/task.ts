@@ -58,12 +58,4 @@ export class Task {
   isComplete(): boolean {
     return this.progress >= this.totalFramesRequired;
   }
-
-  /**
-   * Applies chronoboost acceleration (50% faster for Protoss)
-   */
-  applyChronoboost(_untilFrame: number): void {
-    // Chronoboost increases progress rate by 50%
-    // This is handled in the update logic
-  }
 }

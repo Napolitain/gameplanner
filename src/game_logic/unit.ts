@@ -1,4 +1,5 @@
 import { Task } from './task';
+import { ENERGY_REGEN_PER_FRAME, LARVA_SPAWN_INTERVAL } from './constants';
 
 /**
  * Unit class represents units, structures, or workers in the game
@@ -100,14 +101,14 @@ export class Unit {
    * - Progresses tasks
    */
   update(currentFrame: number): void {
-    // Regenerate energy at 0.03515625 per frame
-    this.energy = Math.min(200, this.energy + 0.03515625);
+    // Regenerate energy
+    this.energy = Math.min(200, this.energy + ENERGY_REGEN_PER_FRAME);
     
-    // Update Zerg larva spawning (every 10.71 seconds at "Faster" speed = 240 frames)
+    // Update Zerg larva spawning
     if (this.isZergTownHall() && currentFrame >= this.nextLarvaSpawn) {
       if (this.larvaCount < 3) {
         this.larvaCount++;
-        this.nextLarvaSpawn = currentFrame + 240; // 10.71 seconds
+        this.nextLarvaSpawn = currentFrame + LARVA_SPAWN_INTERVAL;
       }
     }
     

@@ -92,6 +92,13 @@ export interface UnitData {
 }
 
 /**
+ * Helper to convert game time in seconds to frames
+ */
+function secondsToFrames(seconds: number): number {
+  return seconds / FRAMES_PER_SECOND;
+}
+
+/**
  * Sample unit data (simplified - full data would be much larger)
  */
 export const UNIT_DATA: Record<string, UnitData> = {
@@ -101,7 +108,7 @@ export const UNIT_DATA: Record<string, UnitData> = {
     mineralCost: 50,
     vespeneCost: 0,
     supplyCost: 1,
-    buildTime: 17 / 22.4,
+    buildTime: secondsToFrames(17),
     isWorker: true,
     isStructure: false,
     isUnit: false
@@ -111,7 +118,7 @@ export const UNIT_DATA: Record<string, UnitData> = {
     mineralCost: 50,
     vespeneCost: 0,
     supplyCost: 1,
-    buildTime: 18 / 22.4,
+    buildTime: secondsToFrames(18),
     isWorker: false,
     isStructure: false,
     isUnit: true,
@@ -122,7 +129,7 @@ export const UNIT_DATA: Record<string, UnitData> = {
     mineralCost: 400,
     vespeneCost: 0,
     supplyCost: 0,
-    buildTime: 71 / 22.4,
+    buildTime: secondsToFrames(71),
     isWorker: false,
     isStructure: true,
     isUnit: false
@@ -132,7 +139,7 @@ export const UNIT_DATA: Record<string, UnitData> = {
     mineralCost: 100,
     vespeneCost: 0,
     supplyCost: 0,
-    buildTime: 21 / 22.4,
+    buildTime: secondsToFrames(21),
     isWorker: false,
     isStructure: true,
     isUnit: false
@@ -142,7 +149,7 @@ export const UNIT_DATA: Record<string, UnitData> = {
     mineralCost: 150,
     vespeneCost: 0,
     supplyCost: 0,
-    buildTime: 46 / 22.4,
+    buildTime: secondsToFrames(46),
     isWorker: false,
     isStructure: true,
     isUnit: false,
