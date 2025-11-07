@@ -235,52 +235,100 @@ export class GameLogic {
    * Check and handle completed tasks for a unit
    */
   private checkCompletedTasks(unit: Unit): void {
+    // Check main tasks
     for (let i = unit.tasks.length - 1; i >= 0; i--) {
       const task = unit.tasks[i];
       if (task && task.isComplete()) {
-        // Spawn the result
-        if (task.newWorker) {
-          const worker = new Unit(task.newWorker, this.nextUnitId++);
-          this.units.add(worker);
-          this.supplyUsed++;
-          this.workersMinerals++;
-        }
-        if (task.newUnit) {
-          const newUnit = new Unit(task.newUnit, this.nextUnitId++);
-          this.units.add(newUnit);
-          this.supplyUsed += UNIT_DATA[task.newUnit]?.supplyCost || 0;
-        }
-        if (task.newStructure) {
-          const structure = new Unit(task.newStructure, this.nextUnitId++);
-          this.units.add(structure);
-          this.completedStructures.add(task.newStructure);
-          
-          // Update supply cap for supply structures
-          if (task.newStructure.includes('Depot') || 
-              task.newStructure.includes('Pylon') ||
-              task.newStructure.includes('Overlord')) {
-            this.supplyCap += 8; // Most supply structures add 8
-          }
-        }
-        if (task.newUpgrade) {
-          this.completedUpgrades.add(task.newUpgrade);
-        }
-        
-        // Create completion event
-        const event = new Event(
-          task.newWorker || task.newUnit || task.newStructure || task.newUpgrade || 'action',
-          task.newWorker ? 'worker' : task.newUnit ? 'unit' : task.newStructure ? 'structure' : 'upgrade',
-          task.startFrame,
-          this.frame,
-          task.startSupply,
-          task.id
-        );
-        this.eventLog.push(event);
-        
-        // Remove task
+        this.processCompletedTask(task, unit);
         unit.tasks.splice(i, 1);
       }
     }
+    
+    // Check background tasks (e.g., Zerg larva tasks)
+    for (let i = unit.backgroundTask.length - 1; i >= 0; i--) {
+      const task = unit.backgroundTask[i];
+      if (task && task.isComplete()) {
+        this.processCompletedTask(task, unit);
+        unit.backgroundTask.splice(i, 1);
+      }
+    }
+    
+    // Check addon tasks (e.g., Terran reactor tasks)
+    for (let i = unit.addonTasks.length - 1; i >= 0; i--) {
+      const task = unit.addonTasks[i];
+      if (task && task.isComplete()) {
+        this.processCompletedTask(task, unit);
+        unit.addonTasks.splice(i, 1);
+      }
+    }
+  }
+  
+  /**
+   * Process a completed task - spawn units/structures, create events
+   */
+  private processCompletedTask(task: Task, unit: Unit): void {
+    // Spawn worker
+    if (task.newWorker) {
+      const worker = new Unit(task.newWorker, this.nextUnitId++);
+      this.units.add(worker);
+      this.supplyUsed++;
+      this.workersMinerals++;
+    }
+    
+    // Spawn unit
+    if (task.newUnit) {
+      const newUnit = new Unit(task.newUnit, this.nextUnitId++);
+      this.units.add(newUnit);
+      this.supplyUsed += UNIT_DATA[task.newUnit]?.supplyCost || 0;
+      
+      // Special case: Queen starts with 25 energy
+      if (task.newUnit === 'Queen') {
+        newUnit.energy = 25;
+      }
+      
+      // Special case: Zergling spawns 2 units
+      if (task.newUnit === 'Zergling') {
+        const secondZergling = new Unit(task.newUnit, this.nextUnitId++);
+        this.units.add(secondZergling);
+      }
+    }
+    
+    // Spawn structure
+    if (task.newStructure) {
+      const structure = new Unit(task.newStructure, this.nextUnitId++);
+      structure.energy = 50; // Most structures start with 50 energy
+      this.units.add(structure);
+      this.completedStructures.add(task.newStructure);
+      
+      // Update supply cap for supply structures
+      if (task.newStructure.includes('Depot') || 
+          task.newStructure.includes('Pylon') ||
+          task.newStructure.includes('Overlord')) {
+        this.supplyCap += 8; // Most supply structures add 8
+      }
+    }
+    
+    // Mark upgrade as researched
+    if (task.newUpgrade) {
+      this.completedUpgrades.add(task.newUpgrade);
+    }
+    
+    // Handle morph to unit
+    if (task.morphToUnit) {
+      unit.name = task.morphToUnit;
+      unit.energy = 50;
+    }
+    
+    // Create completion event
+    const event = new Event(
+      task.newWorker || task.newUnit || task.newStructure || task.newUpgrade || task.morphToUnit || 'action',
+      task.newWorker ? 'worker' : task.newUnit ? 'unit' : task.newStructure ? 'structure' : 'upgrade',
+      task.startFrame,
+      this.frame,
+      task.startSupply,
+      task.id
+    );
+    this.eventLog.push(event);
   }
 
   /**

@@ -1,6 +1,9 @@
 import { Task } from './task';
 import { ENERGY_REGEN_PER_FRAME, LARVA_SPAWN_INTERVAL } from './constants';
 
+// Worker types for checking if unit is a worker
+const WORKER_TYPES = new Set(['SCV', 'Probe', 'Drone']);
+
 /**
  * Unit class represents units, structures, or workers in the game
  */
@@ -46,6 +49,18 @@ export class Unit {
   
   /** Race-specific resource accumulator for display */
   raceResourceAccumulator: number;
+  
+  /** Unit expiration frame (e.g., for MULE) - -1 means never expires */
+  isAliveUntilFrame: number;
+  
+  /** Terran supply depot - has supply drop */
+  hasSupplyDrop: boolean;
+  
+  /** Background tasks (e.g., Zerg larva tasks) */
+  backgroundTask: Task[];
+  
+  /** Addon tasks (e.g., Terran reactor tasks) */
+  addonTasks: Task[];
 
   constructor(name: string, id: number) {
     this.name = name;
@@ -62,19 +77,33 @@ export class Unit {
     this.nextLarvaSpawn = 0;
     this.hasInjectUntilFrame = 0;
     this.raceResourceAccumulator = 0;
+    this.isAliveUntilFrame = -1;
+    this.hasSupplyDrop = false;
+    this.backgroundTask = [];
+    this.addonTasks = [];
   }
 
   /**
    * Checks if the unit is idle (no tasks or has available slots)
    */
   isIdle(): boolean {
+    // If flying, not idle
+    if (this.isFlying) {
+      return false;
+    }
+    
+    // Workers that are mining or scouting are not idle
+    if (WORKER_TYPES.has(this.name) && (this.isMiningGas || this.isScouting)) {
+      return false;
+    }
+    
     // No tasks means idle
     if (this.tasks.length === 0) {
       return true;
     }
     
-    // Reactor allows 2 simultaneous tasks
-    if (this.hasReactor && this.tasks.length < 2) {
+    // Reactor allows 2 simultaneous tasks - idle if addon has space
+    if (this.hasAddon() && this.addonTasks.length === 0) {
       return true;
     }
     
@@ -90,7 +119,43 @@ export class Unit {
    * Checks if the unit is busy (has active tasks)
    */
   isBusy(): boolean {
-    return !this.isIdle();
+    return this.tasks.length > 0 || this.backgroundTask.length > 0 || this.addonTasks.length > 0;
+  }
+  
+  /**
+   * Checks if this unit has an addon (techlab or reactor)
+   */
+  hasAddon(): boolean {
+    return this.hasTechlab || this.hasReactor;
+  }
+  
+  /**
+   * Checks if this worker is mining minerals (not gas, not scouting)
+   */
+  isMiningMinerals(): boolean {
+    return WORKER_TYPES.has(this.name) && this.isIdle() && !this.isMiningGas && !this.isScouting;
+  }
+  
+  /**
+   * Checks if unit is still alive (for units with expiration like MULE)
+   */
+  isAlive(frame: number): boolean {
+    return this.isAliveUntilFrame === -1 || frame < this.isAliveUntilFrame;
+  }
+  
+  /**
+   * Checks if chronoboost is currently active
+   */
+  hasChrono(frame: number): boolean {
+    return this.hasChronoUntilFrame > 0 && this.hasChronoUntilFrame > frame;
+  }
+  
+  /**
+   * Activates chronoboost - automatically calculates when it should run out
+   * Chronoboost lasts 20 seconds at normal speed, 20 * 22.4 frames at Faster speed
+   */
+  addChrono(startFrame: number): void {
+    this.hasChronoUntilFrame = startFrame + 20 * 22.4;
   }
 
   /**
@@ -99,14 +164,29 @@ export class Unit {
    * - Updates larva spawning
    * - Processes inject larvae
    * - Progresses tasks
+   * - Expires chronoboost
    */
   update(currentFrame: number): void {
     // Regenerate energy
     this.energy = Math.min(200, this.energy + ENERGY_REGEN_PER_FRAME);
     
     // Update Zerg larva spawning
-    if (this.isZergTownHall() && currentFrame >= this.nextLarvaSpawn) {
-      if (this.larvaCount < 3) {
+    if (this.isZergTownHall()) {
+      // Initialize larva spawning for new hatchery
+      if (this.nextLarvaSpawn === 0) {
+        this.nextLarvaSpawn = currentFrame + LARVA_SPAWN_INTERVAL;
+        if (this.larvaCount === 0) {
+          this.larvaCount = 1;
+        }
+      }
+      
+      // If at max larva (3), pause larva timer by incrementing it
+      if (this.larvaCount >= 3) {
+        this.nextLarvaSpawn += 1;
+      }
+      
+      // Spawn larva when time has elapsed
+      if (this.nextLarvaSpawn > 0 && currentFrame >= this.nextLarvaSpawn) {
         this.larvaCount++;
         this.nextLarvaSpawn = currentFrame + LARVA_SPAWN_INTERVAL;
       }
@@ -114,19 +194,38 @@ export class Unit {
     
     // Process inject larvae spawning
     if (this.hasInjectUntilFrame > 0 && currentFrame >= this.hasInjectUntilFrame) {
-      this.larvaCount = Math.min(19, this.larvaCount + 4);
+      this.larvaCount = Math.min(19, this.larvaCount + 3);
       this.hasInjectUntilFrame = 0;
     }
     
-    // Update tasks
+    // Expire chronoboost
+    if (this.hasChronoUntilFrame > 0 && currentFrame >= this.hasChronoUntilFrame) {
+      this.hasChronoUntilFrame = 0;
+    }
+    
+    // Update main tasks
     for (const task of this.tasks) {
       if (task) {
         // Apply chronoboost acceleration if active
-        const progressRate = (this.hasChronoUntilFrame > currentFrame) ? 1.5 : 1.0;
+        const progressRate = this.hasChrono(currentFrame) ? 1.5 : 1.0;
         task.progress += progressRate;
         
         // Note: Don't remove completed tasks here - GameLogic.checkCompletedTasks() 
         // will handle task removal after processing the results
+      }
+    }
+    
+    // Update background tasks (e.g., Zerg larva tasks)
+    for (const task of this.backgroundTask) {
+      if (task) {
+        task.progress += 1.0;
+      }
+    }
+    
+    // Update addon tasks (e.g., Terran reactor tasks)
+    for (const task of this.addonTasks) {
+      if (task) {
+        task.progress += 1.0;
       }
     }
   }
@@ -140,9 +239,18 @@ export class Unit {
 
   /**
    * Adds a task to this unit
+   * @param task - The task to add
+   * @param taskForReactor - If true, adds to reactor task queue
+   * @param taskForLarva - If true, adds to background task queue (for larva)
    */
-  addTask(task: Task): void {
-    this.tasks.push(task);
+  addTask(task: Task, taskForReactor: boolean = false, taskForLarva: boolean = false): void {
+    if (taskForReactor) {
+      this.addonTasks.push(task);
+    } else if (taskForLarva) {
+      this.backgroundTask.push(task);
+    } else {
+      this.tasks.push(task);
+    }
   }
 
   /**
