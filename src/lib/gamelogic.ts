@@ -413,7 +413,7 @@ export class GameLogic {
     if (this.vespene < unitData.vespeneCost) {
       return false;
     }
-    if (this.supplyLeft < unitData.supplyCost) {
+    if (unitData.supplyCost > 0 && this.supplyLeft < unitData.supplyCost) {
       return false;
     }
     
@@ -461,7 +461,8 @@ export class GameLogic {
     
     // Add task to trainer
     // For Zerg units trained from larva, use background tasks
-    const useBackgroundTask = firstIdle.larvaCount > 0 && unitData.isWorker;
+    // This applies to all Zerg units (workers, combat units, etc.) trained from larva
+    const useBackgroundTask = firstIdle.larvaCount > 0;
     if (useBackgroundTask) {
       firstIdle.useLarva();
       firstIdle.addTask(task, false, true);
