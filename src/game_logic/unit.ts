@@ -102,8 +102,8 @@ export class Unit {
       return true;
     }
     
-    // Reactor allows 2 simultaneous tasks - idle if addon has space
-    if (this.hasAddon() && this.addonTasks.length === 0) {
+    // Reactor allows 2 simultaneous tasks - idle if reactor has space
+    if (this.hasReactor && this.addonTasks.length < 2) {
       return true;
     }
     
@@ -190,7 +190,7 @@ export class Unit {
     
     // Process inject larvae spawning
     if (this.hasInjectUntilFrame > 0 && currentFrame >= this.hasInjectUntilFrame) {
-      this.larvaCount = Math.min(19, this.larvaCount + 3);
+      this.larvaCount = Math.min(19, this.larvaCount + 4);
       this.hasInjectUntilFrame = 0;
     }
     

@@ -293,10 +293,11 @@ export class GameLogic {
         newUnit.energy = QUEEN_INITIAL_ENERGY;
       }
       
-      // Special case: Zergling spawns 2 units
+      // Special case: Zergling spawns 2 units (pair)
       if (task.newUnit === 'Zergling') {
         const secondZergling = new Unit(task.newUnit, this.nextUnitId++);
         this.units.add(secondZergling);
+        // Don't add supply cost again - already counted (pair costs 1 supply total)
       }
     }
     
