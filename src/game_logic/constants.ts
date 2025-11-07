@@ -30,6 +30,16 @@ export const MAX_NATURAL_LARVA = 3;
 export const MAX_INJECT_LARVA = 19;
 
 /**
+ * Initial energy for most structures and units
+ */
+export const INITIAL_ENERGY = 50;
+
+/**
+ * Initial energy for Queens
+ */
+export const QUEEN_INITIAL_ENERGY = 25;
+
+/**
  * Starting resources and supply by race
  */
 export const RACE_STARTING_DATA: Record<Race, {

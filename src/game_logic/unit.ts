@@ -1,5 +1,5 @@
 import { Task } from './task';
-import { ENERGY_REGEN_PER_FRAME, LARVA_SPAWN_INTERVAL } from './constants';
+import { ENERGY_REGEN_PER_FRAME, LARVA_SPAWN_INTERVAL, FRAMES_PER_SECOND } from './constants';
 
 // Worker types for checking if unit is a worker
 const WORKER_TYPES = new Set(['SCV', 'Probe', 'Drone']);
@@ -131,9 +131,10 @@ export class Unit {
   
   /**
    * Checks if this worker is mining minerals (not gas, not scouting)
+   * A worker mines minerals when it has no tasks, is not mining gas, and is not scouting
    */
   isMiningMinerals(): boolean {
-    return WORKER_TYPES.has(this.name) && this.isIdle() && !this.isMiningGas && !this.isScouting;
+    return WORKER_TYPES.has(this.name) && !this.isMiningGas && !this.isScouting && this.tasks.length === 0;
   }
   
   /**
@@ -152,10 +153,10 @@ export class Unit {
   
   /**
    * Activates chronoboost - automatically calculates when it should run out
-   * Chronoboost lasts 20 seconds at normal speed, 20 * 22.4 frames at Faster speed
+   * Chronoboost lasts 20 seconds at normal speed
    */
   addChrono(startFrame: number): void {
-    this.hasChronoUntilFrame = startFrame + 20 * 22.4;
+    this.hasChronoUntilFrame = startFrame + 20 * FRAMES_PER_SECOND;
   }
 
   /**
@@ -180,13 +181,8 @@ export class Unit {
         }
       }
       
-      // If at max larva (3), pause larva timer by incrementing it
-      if (this.larvaCount >= 3) {
-        this.nextLarvaSpawn += 1;
-      }
-      
-      // Spawn larva when time has elapsed
-      if (this.nextLarvaSpawn > 0 && currentFrame >= this.nextLarvaSpawn) {
+      // Spawn larva when time has elapsed (only if below max)
+      if (this.larvaCount < 3 && this.nextLarvaSpawn > 0 && currentFrame >= this.nextLarvaSpawn) {
         this.larvaCount++;
         this.nextLarvaSpawn = currentFrame + LARVA_SPAWN_INTERVAL;
       }

@@ -3,7 +3,14 @@ import { Task } from './task';
 import { Event } from './event';
 import { calculateMineralIncome, calculateVespeneIncome } from './income';
 import type { Race } from './constants';
-import { RACE_STARTING_DATA, FRAMES_PER_SECOND, UNIT_DATA, LARVA_SPAWN_INTERVAL } from './constants';
+import { 
+  RACE_STARTING_DATA, 
+  FRAMES_PER_SECOND, 
+  UNIT_DATA, 
+  LARVA_SPAWN_INTERVAL,
+  INITIAL_ENERGY,
+  QUEEN_INITIAL_ENERGY
+} from './constants';
 
 /**
  * Build order item interface
@@ -281,9 +288,9 @@ export class GameLogic {
       this.units.add(newUnit);
       this.supplyUsed += UNIT_DATA[task.newUnit]?.supplyCost || 0;
       
-      // Special case: Queen starts with 25 energy
+      // Special case: Queen starts with different energy
       if (task.newUnit === 'Queen') {
-        newUnit.energy = 25;
+        newUnit.energy = QUEEN_INITIAL_ENERGY;
       }
       
       // Special case: Zergling spawns 2 units
@@ -296,7 +303,7 @@ export class GameLogic {
     // Spawn structure
     if (task.newStructure) {
       const structure = new Unit(task.newStructure, this.nextUnitId++);
-      structure.energy = 50; // Most structures start with 50 energy
+      structure.energy = INITIAL_ENERGY;
       this.units.add(structure);
       this.completedStructures.add(task.newStructure);
       
@@ -316,7 +323,7 @@ export class GameLogic {
     // Handle morph to unit
     if (task.morphToUnit) {
       unit.name = task.morphToUnit;
-      unit.energy = 50;
+      unit.energy = INITIAL_ENERGY;
     }
     
     // Create completion event
