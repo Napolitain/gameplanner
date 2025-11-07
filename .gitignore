@@ -33,6 +33,8 @@ node_modules/
 
 # Tests (temporary)
 test/
+*.test.ts
+*.spec.ts
 
 # OS specific
 .DS_Store
