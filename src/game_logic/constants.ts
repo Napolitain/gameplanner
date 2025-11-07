@@ -95,7 +95,7 @@ export interface UnitData {
  * Helper to convert game time in seconds to frames
  */
 function secondsToFrames(seconds: number): number {
-  return seconds / FRAMES_PER_SECOND;
+  return seconds * FRAMES_PER_SECOND;
 }
 
 /**

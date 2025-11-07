@@ -81,7 +81,7 @@ export class GameLogic {
     this.supplyLeft = this.supplyCap - this.supplyUsed;
     
     this.raceSpecificResource = 0;
-    this.workersMinerals = 0; // Workers start after delay
+    this.workersMinerals = startData.workers; // Starting workers mine after delay
     this.workersVespene = 0;
     this.workersScouting = 0;
     
@@ -362,7 +362,7 @@ export class GameLogic {
     this.vespene -= unitData.vespeneCost;
     
     // Create task
-    const buildFrames = Math.floor(unitData.buildTime * FRAMES_PER_SECOND);
+    const buildFrames = Math.floor(unitData.buildTime);
     const taskResult: {
       newWorker?: string;
       newUnit?: string;

@@ -119,17 +119,14 @@ export class Unit {
     }
     
     // Update tasks
-    for (let i = this.tasks.length - 1; i >= 0; i--) {
-      const task = this.tasks[i];
+    for (const task of this.tasks) {
       if (task) {
         // Apply chronoboost acceleration if active
         const progressRate = (this.hasChronoUntilFrame > currentFrame) ? 1.5 : 1.0;
         task.progress += progressRate;
         
-        // Check if task is complete
-        if (task.isComplete()) {
-          this.tasks.splice(i, 1);
-        }
+        // Note: Don't remove completed tasks here - GameLogic.checkCompletedTasks() 
+        // will handle task removal after processing the results
       }
     }
   }
