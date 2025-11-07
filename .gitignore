@@ -3,6 +3,7 @@ build/
 out/
 bin/
 obj/
+dist/
 
 # Visual Studio
 .vs/
@@ -25,6 +26,10 @@ target/
 Cargo.lock
 **/*.rs.bk
 *.pdb
+
+# Node / npm
+node_modules/
+.astro/
 
 # OS specific
 .DS_Store
