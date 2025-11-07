@@ -31,6 +31,9 @@ Cargo.lock
 node_modules/
 .astro/
 
+# Tests (temporary)
+test/
+
 # OS specific
 .DS_Store
 Thumbs.db
