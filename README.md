@@ -1,157 +1,151 @@
 # Game Planner
 
-A cross-platform build order planner for strategy games, built with C++ and WinUI3.
+A modern web-based build order planner for strategy games, built with Astro, Svelte, TypeScript, and Tailwind CSS.
 
 ## Overview
 
-Game Planner is an application designed to help strategy game players create, manage, and optimize build orders. Similar to tools like BurnySC2's SC2 Planner, this application allows users to:
+Game Planner is a static web application designed to help strategy game players create, manage, and optimize build orders. The application allows users to:
 
-- Select from multiple supported games
-- Browse available units, buildings, and actions
-- Create custom build orders by adding items in sequence
-- Visualize and manage the build order timeline
+- Browse available moves and actions by category
+- View sample chess openings (Italian Game, Ruy Lopez, Sicilian Defense)
+- Create custom build orders interactively
+- Visualize and manage build order sequences
+- Track move counts and timings
 
-The application is architected with a cross-platform C++ core library and a Windows-native WinUI3 user interface.
+The application is built as a static website that can be deployed to GitHub Pages or any static hosting service.
+
+## Technology Stack
+
+- **Framework**: [Astro](https://astro.build/) - Static Site Generator
+- **UI Components**: [Svelte](https://svelte.dev/) - Reactive UI framework
+- **Language**: [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 
 ## Features
 
-### Core Library (Cross-Platform)
-- **Game-agnostic data model**: Flexible architecture supporting multiple strategy games
-- **Build order management**: Create, modify, and export build orders
-- **Resource tracking**: Track costs and requirements for each item
-- **Extensible design**: Easy to add new games and items
-
-### Windows UI (WinUI3)
-- **Left sidebar**: Game selection with visual game list
-- **Item browser**: Searchable list of available items with categories
-- **Build order panel**: Interactive build order creation and management
-- **Modern design**: Fluent Design System with WinUI3
+- **Interactive Build Order Creator**: Add, remove, and manage moves in your build order
+- **Sample Openings**: Pre-configured chess opening sequences (Italian Game, Ruy Lopez, Sicilian Defense)
+- **Move Browser**: Browse all available moves organized by category
+- **Responsive Design**: Modern, mobile-friendly interface with Tailwind CSS
+- **Type-Safe**: Full TypeScript implementation for reliability
+- **Static Site**: Fast, deployable anywhere without server requirements
 
 ### Supported Games
-- **StarCraft 2**: Terran units, structures, and upgrades
-- **Hearts of Iron IV**: Division templates, production, and research
+
+- **Chess**: 21 different moves including:
+  - Pawn openings (e4, d4, c4)
+  - Knight development (Nf3, Nc3, Nf6, Nc6)
+  - Bishop development (Bc4, Bb5, Bc5, Be7)
+  - Special moves (castling, etc.)
 
 ## Project Structure
 
 ```
 gameplanner/
-├── lib/                    # Cross-platform C++ library
-│   ├── include/
-│   │   ├── GamePlanner.h   # Core data structures
-│   │   └── GameFactory.h   # Game data factory
-│   └── src/
-│       └── GameFactory.cpp # Game implementations
-├── winui/                  # Windows WinUI3 application
-│   ├── MainWindow.xaml     # Main UI layout
-│   ├── MainWindow.xaml.h/cpp
-│   ├── App.xaml
-│   ├── App.xaml.h/cpp
-│   └── Package.appxmanifest
-└── CMakeLists.txt          # Build configuration
+├── src/
+│   ├── components/          # Svelte components
+│   │   ├── MovesList.svelte
+│   │   ├── OpeningDisplay.svelte
+│   │   └── BuildOrderCreator.svelte
+│   ├── layouts/             # Astro layouts
+│   │   └── Layout.astro
+│   ├── lib/                 # TypeScript core logic
+│   │   ├── game.ts          # Game data models
+│   │   ├── buildOrder.ts    # Build order management
+│   │   └── chess.ts         # Chess game implementation
+│   └── pages/               # Astro pages
+│       └── index.astro      # Main page
+├── public/                  # Static assets
+│   └── favicon.svg
+├── astro.config.mjs         # Astro configuration
+├── tailwind.config.mjs      # Tailwind configuration
+├── tsconfig.json            # TypeScript configuration
+└── package.json             # Dependencies and scripts
 ```
 
 ## Building
 
 ### Prerequisites
 
-#### For Core Library (All Platforms)
-- CMake 3.20 or later
-- C++23 compatible compiler with `<print>` support
-  - Windows: Visual Studio 2022 (17.10+) or MinGW GCC 14+
-  - Linux: GCC 14+ or Clang 18+
-  - macOS: Xcode 16+ (Apple Clang with C++23 support)
+- Node.js 18+ or later
+- npm or yarn
 
-#### For Windows UI
-- Windows 10 SDK (10.0.19041.0 or later)
-- Visual Studio 2022 with:
-  - Desktop development with C++
-  - Windows App SDK
-  - C++/WinRT extensions
+### Development
 
-### Build Instructions
-
-#### Core Library Only (Cross-Platform)
 ```bash
-mkdir build
-cd build
-cmake ..
-cmake --build .
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-#### Windows Application
-The WinUI3 application requires Visual Studio 2022:
+The development server will start at `http://localhost:4321`
 
-1. Open the project in Visual Studio 2022
-2. Ensure Windows App SDK is installed
-3. Set the startup project to the WinUI application
-4. Build and run (F5)
+### Production Build
 
-**Note**: WinUI3 applications are best built using Visual Studio. CMake support for WinUI3 is limited.
+```bash
+# Build static site
+npm run build
 
-## Continuous Integration
-
-The project includes CI/CD workflows that automatically build and test on:
-- **Linux**: GCC 14 on Ubuntu 24.04
-- **macOS**: Latest Clang on macOS 14
-- **Windows**: MinGW GCC 14 and MSVC (Visual Studio 2022)
-
-See [`.github/workflows/README.md`](.github/workflows/README.md) for details.
-
-[![Build Core Library](../../actions/workflows/build-library.yml/badge.svg)](../../actions/workflows/build-library.yml)
-[![Build WinUI3](../../actions/workflows/build-winui.yml/badge.svg)](../../actions/workflows/build-winui.yml)
-
-## Architecture
-
-### Core Data Model
-
-The application uses a hierarchical data model:
-
-```
-Game
-├── GameItem (units, buildings, actions)
-│   ├── Resources (costs)
-│   ├── Build time
-│   └── Category
-└── Build order
-    └── BuildOrderStep
-        └── GameItem reference
+# Preview production build
+npm run preview
 ```
 
-### Key Classes
+The built site will be in the `dist/` directory, ready for deployment.
 
-- **`Game`**: Represents a game with its items and rules
-- **`GameItem`**: A buildable unit, structure, or action
-- **`BuildOrder`**: A sequence of build steps
-- **`BuildOrderStep`**: A single step in a build order
-- **`GameFactory`**: Factory for creating game data
+## Deployment to GitHub Pages
+
+The project is configured for deployment to GitHub Pages. A GitHub Actions workflow automatically builds and deploys the site when changes are pushed to the main branch.
+
+The site will be available at: `https://napolitain.github.io/gameplanner/`
+
+## Core Data Model
+
+The application uses a simple, extensible data model:
+
+```typescript
+// Game item (move, action, unit, etc.)
+interface GameItem {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  timeCost: number;
+  resources: Resource[];
+}
+
+// Build order step
+interface BuildOrderStep {
+  stepNumber: number;
+  item: GameItem;
+  notes: string;
+}
+
+// Complete build order
+interface BuildOrder {
+  name: string;
+  steps: BuildOrderStep[];
+}
+```
 
 ## Adding New Games
 
 To add a new game:
 
-1. Open `lib/src/GameFactory.cpp`
-2. Create a new factory method following the existing pattern:
-   ```cpp
-   std::shared_ptr<Game> GameFactory::CreateYourGame() {
-       auto game = std::make_shared<Game>("game_id", "Game Name");
-       // Add items...
-       return game;
-   }
-   ```
-3. Add the game to `CreateAllGames()`:
-   ```cpp
-   games.push_back(CreateYourGame());
-   ```
+1. Create a new file in `src/lib/` (e.g., `starcraft.ts`)
+2. Define your game items following the `chess.ts` pattern
+3. Export a creation function like `createStarCraftGame()`
+4. Update `src/pages/index.astro` to include your new game
 
 ## Future Enhancements
 
-- [ ] Linux UI support (GTK4 or Qt)
-- [ ] macOS UI support
-- [ ] Save/load build orders to file
-- [ ] Export build orders to various formats
+- [ ] Save/load build orders to localStorage
+- [ ] Export build orders to JSON/text
+- [ ] Support for multiple games (StarCraft 2, Age of Empires, etc.)
 - [ ] Timing calculations and resource tracking
 - [ ] Build order validation
-- [ ] Templates and preset build orders
+- [ ] Dark mode support
 - [ ] Community sharing features
 
 ## Contributing
@@ -164,10 +158,14 @@ Contributions are welcome! Please feel free to submit pull requests or open issu
 
 ## License
 
-[Add your license here]
+MIT License
 
 ## Acknowledgments
 
 Inspired by:
 - [BurnySC2's SC2 Planner](https://burnysc2.github.io/sc2-planner/)
 - Various build order tools in the strategy gaming community
+
+---
+
+Built with ❤️ using Astro, Svelte, TypeScript, and Tailwind CSS

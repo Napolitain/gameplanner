@@ -1,0 +1,59 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MovesList from '../components/MovesList.svelte';
+import OpeningDisplay from '../components/OpeningDisplay.svelte';
+import BuildOrderCreator from '../components/BuildOrderCreator.svelte';
+import { createChessGame, getItalianGameSample, getRuyLopezSample, getSicilianDefenseSample } from '../lib/chess';
+
+const game = createChessGame();
+---
+
+<Layout title="Game Planner - Chess">
+  <main class="container mx-auto px-4 py-8">
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-gray-900 mb-4">🎮 Game Planner</h1>
+      <p class="text-xl text-gray-600 mb-2">Interactive Chess Demo</p>
+      <div class="bg-blue-100 border-l-4 border-blue-500 p-4 max-w-2xl mx-auto">
+        <p class="text-lg font-medium text-blue-900">{game.name}</p>
+        <p class="text-gray-700">{game.description}</p>
+      </div>
+    </header>
+
+    <div class="mb-12">
+      <MovesList game={game} client:load />
+    </div>
+
+    <div class="mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-6">Sample Chess Openings</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <OpeningDisplay 
+          game={game} 
+          openingName="Italian Game"
+          moveIds={getItalianGameSample()}
+          client:load 
+        />
+        <OpeningDisplay 
+          game={game} 
+          openingName="Ruy Lopez"
+          moveIds={getRuyLopezSample()}
+          client:load 
+        />
+        <OpeningDisplay 
+          game={game} 
+          openingName="Sicilian Defense"
+          moveIds={getSicilianDefenseSample()}
+          client:load 
+        />
+      </div>
+    </div>
+
+    <div class="mb-12">
+      <BuildOrderCreator game={game} client:load />
+    </div>
+
+    <footer class="text-center text-gray-600 mt-16 pb-8">
+      <p class="text-sm">Built with Astro, Svelte, TypeScript, and Tailwind CSS</p>
+      <p class="text-xs mt-2">Game Planner v0.1.0 - MIT License</p>
+    </footer>
+  </main>
+</Layout>

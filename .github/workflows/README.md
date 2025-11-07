@@ -1,130 +1,128 @@
 # Continuous Integration & Deployment
 
-This directory contains GitHub Actions workflows for building and testing the Game Planner Rust application.
+This directory contains GitHub Actions workflows for building and deploying the Game Planner web application.
 
 ## Workflow
 
-### Rust Build & Test (`rust-build.yml`)
+### Deploy to GitHub Pages (`deploy.yml`)
 
-Builds and tests the Rust codebase on multiple platforms:
-
-- **Linux (Ubuntu latest)**: Full build with tests, clippy linting, and formatting checks
-- **macOS (latest)**: Build and run tests
-- **Windows (latest)**: Build all packages including Windows UI
+Builds and deploys the Astro static site to GitHub Pages:
 
 **Triggers:**
-- Push to `main`, `develop`, or `copilot/**` branches
-- Pull requests to `main` or `develop`
+- Push to `main` branch
+- Manual workflow dispatch
 
-**Artifacts:**
-- `gameplanner-linux-rust`: Linux CLI binary and library
-- `gameplanner-macos-rust`: macOS CLI binary and library
-- `gameplanner-windows-rust`: Windows CLI, Windows UI, and library
+**Permissions:**
+- Contents: read
+- Pages: write
+- ID token: write
 
 **What it does:**
 1. Checks out the code
-2. Installs Rust toolchain (stable)
-3. Caches cargo dependencies for faster builds
-4. Runs formatting checks (`cargo fmt --check`)
-5. Runs Clippy linting (`cargo clippy`)
-6. Builds all packages in release mode
-7. Runs all tests
-8. Runs the CLI demo to verify functionality
-9. Uploads build artifacts
+2. Sets up Node.js 20
+3. Installs npm dependencies (`npm ci`)
+4. Builds the Astro site (`npm run build`)
+5. Uploads build artifacts to GitHub Pages
+6. Deploys to GitHub Pages
+
+**Deployment URL:**
+- https://napolitain.github.io/gameplanner/
 
 ## Running Locally
 
 ### Prerequisites
-- Rust (install from [rustup.rs](https://rustup.rs/))
-- Windows SDK (for Windows UI builds on Windows only)
+- Node.js 18+ or later
+- npm
 
-### Build Commands
-
-```bash
-# Build everything
-cargo build --release
-
-# Build only core library
-cargo build --package gameplanner-core --release
-
-# Build only CLI
-cargo build --package gameplanner-cli --release
-
-# Build only Windows UI (Windows only)
-cargo build --package gameplanner-ui-windows --release
-
-# Run tests
-cargo test --all
-
-# Run clippy
-cargo clippy --all-targets --all-features -- -D warnings
-
-# Check formatting
-cargo fmt --all -- --check
-
-# Fix formatting
-cargo fmt --all
-```
-
-### Running the Demo
+### Development Commands
 
 ```bash
-# Interactive CLI
-cargo run --package gameplanner-cli --release
+# Install dependencies
+npm install
 
-# Windows UI (Windows only)
-cargo run --package gameplanner-ui-windows --release
+# Start development server (localhost:4321)
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Type check
+npm run astro check
 ```
 
-## Code Quality
+## Project Structure
 
-### Formatting
-All code must pass `cargo fmt` checks. Run `cargo fmt --all` before committing.
-
-### Linting
-All code must pass `cargo clippy` with no warnings. Run:
-```bash
-cargo clippy --all-targets --all-features -- -D warnings
+```
+src/
+├── components/          # Svelte components
+│   ├── MovesList.svelte
+│   ├── OpeningDisplay.svelte
+│   └── BuildOrderCreator.svelte
+├── layouts/            # Astro layouts
+│   └── Layout.astro
+├── lib/                # TypeScript core logic
+│   ├── game.ts
+│   ├── buildOrder.ts
+│   └── chess.ts
+└── pages/              # Astro pages
+    └── index.astro
 ```
 
-### Testing
-All tests must pass. Run:
-```bash
-cargo test --all
-```
+## Technology Stack
 
-## Caching
+- **Astro**: Static site generator
+- **Svelte**: Reactive UI components
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
 
-The workflow uses GitHub Actions caching for:
-- Cargo registry (~/.cargo/registry)
-- Cargo git dependencies (~/.cargo/git)
-- Build artifacts (target/)
+## Build Output
 
-This significantly speeds up builds by reusing dependencies.
+The build process generates a static site in the `dist/` directory:
+- Optimized HTML, CSS, and JavaScript
+- Pre-rendered pages for fast loading
+- Minified assets for production
+- Ready for deployment to any static host
+
+## Deployment
+
+### GitHub Pages
+The site automatically deploys to GitHub Pages when changes are pushed to `main`.
+
+### Manual Deployment
+You can also deploy manually to any static hosting service:
+1. Run `npm run build`
+2. Upload the `dist/` directory to your host
+
+### Supported Hosts
+- GitHub Pages
+- Netlify
+- Vercel
+- Cloudflare Pages
+- Any static file server
 
 ## Troubleshooting
 
-### Build fails with "cannot find crate"
-- Clear cargo cache and rebuild
-- Check Cargo.toml dependencies
+### Build fails with TypeScript errors
+- Run `npm run astro check` to see detailed errors
+- Fix type errors in your TypeScript files
 
-### Windows UI build fails
-- Ensure Windows SDK is installed
-- Check that windows crate is properly configured
+### Dependencies out of date
+- Run `npm update` to update dependencies
+- Check `package.json` for version compatibility
 
-### Clippy warnings
-- Fix all clippy warnings before pushing
-- Use `#[allow(clippy::...)]` only for false positives
-
-### Test failures
-- Run tests locally: `cargo test --all`
-- Check test output for specific failures
+### Pages not loading correctly
+- Check the `base` setting in `astro.config.mjs`
+- Ensure it matches your deployment path
 
 ## Future Enhancements
 
-- [ ] Code coverage reporting (tarpaulin)
-- [ ] Benchmark suite
-- [ ] Security audit (cargo-audit)
-- [ ] Dependency updates bot (dependabot)
-- [ ] Performance regression tests
-- [ ] Documentation generation and hosting
+- [ ] Automated testing with Vitest
+- [ ] E2E testing with Playwright
+- [ ] Performance monitoring
+- [ ] Accessibility testing
+- [ ] Bundle size optimization
+- [ ] PWA support
+
