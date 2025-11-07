@@ -126,8 +126,9 @@ export class Unit {
   }
   
   /**
-   * Checks if this worker is mining minerals (not gas, not scouting)
-   * A worker mines minerals when it has no tasks, is not mining gas, and is not scouting
+   * Checks if this worker is mining minerals
+   * Returns true only if the unit is a worker type (SCV, Probe, Drone),
+   * has no tasks, is not mining gas, and is not scouting
    */
   isMiningMinerals(): boolean {
     return WORKER_TYPES.has(this.name) && !this.isMiningGas && !this.isScouting && this.tasks.length === 0;
@@ -144,7 +145,7 @@ export class Unit {
    * Checks if chronoboost is currently active
    */
   hasChrono(frame: number): boolean {
-    return this.hasChronoUntilFrame > 0 && this.hasChronoUntilFrame > frame;
+    return this.hasChronoUntilFrame > frame;
   }
   
   /**

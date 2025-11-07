@@ -294,10 +294,11 @@ export class GameLogic {
       }
       
       // Special case: Zergling spawns 2 units (pair)
+      // Note: In StarCraft 2, one Zergling egg produces two Zerglings
+      // The supply cost (1) is already counted above and covers both
       if (task.newUnit === 'Zergling') {
         const secondZergling = new Unit(task.newUnit, this.nextUnitId++);
         this.units.add(secondZergling);
-        // Don't add supply cost again - already counted (pair costs 1 supply total)
       }
     }
     
