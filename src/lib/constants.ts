@@ -165,6 +165,126 @@ export const UNIT_DATA: Record<string, UnitData> = {
     isUnit: false,
     requires: ['SupplyDepot']
   },
+  Marauder: {
+    name: 'Marauder',
+    mineralCost: 100,
+    vespeneCost: 25,
+    supplyCost: 2,
+    buildTime: secondsToFrames(21),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Barracks']
+  },
+  Reaper: {
+    name: 'Reaper',
+    mineralCost: 50,
+    vespeneCost: 50,
+    supplyCost: 1,
+    buildTime: secondsToFrames(32),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Barracks']
+  },
+  Factory: {
+    name: 'Factory',
+    mineralCost: 150,
+    vespeneCost: 100,
+    supplyCost: 0,
+    buildTime: secondsToFrames(43),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false,
+    requires: ['Barracks']
+  },
+  Hellion: {
+    name: 'Hellion',
+    mineralCost: 100,
+    vespeneCost: 0,
+    supplyCost: 2,
+    buildTime: secondsToFrames(21),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Factory']
+  },
+  SiegeTank: {
+    name: 'SiegeTank',
+    mineralCost: 150,
+    vespeneCost: 125,
+    supplyCost: 3,
+    buildTime: secondsToFrames(32),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Factory']
+  },
+  Starport: {
+    name: 'Starport',
+    mineralCost: 150,
+    vespeneCost: 100,
+    supplyCost: 0,
+    buildTime: secondsToFrames(36),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false,
+    requires: ['Factory']
+  },
+  Medivac: {
+    name: 'Medivac',
+    mineralCost: 100,
+    vespeneCost: 100,
+    supplyCost: 2,
+    buildTime: secondsToFrames(30),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Starport']
+  },
+  Viking: {
+    name: 'Viking',
+    mineralCost: 150,
+    vespeneCost: 75,
+    supplyCost: 2,
+    buildTime: secondsToFrames(30),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Starport']
+  },
+  Banshee: {
+    name: 'Banshee',
+    mineralCost: 150,
+    vespeneCost: 100,
+    supplyCost: 3,
+    buildTime: secondsToFrames(43),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true,
+    requires: ['Starport']
+  },
+  Refinery: {
+    name: 'Refinery',
+    mineralCost: 75,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(21),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false
+  },
+  OrbitalCommand: {
+    name: 'OrbitalCommand',
+    mineralCost: 150,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(25),
+    isWorker: false,
+    isStructure: false,
+    isUnit: false,
+    requires: ['CommandCenter']
+  },
   // Protoss
   Probe: {
     name: 'Probe',
