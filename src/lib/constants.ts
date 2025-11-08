@@ -165,5 +165,67 @@ export const UNIT_DATA: Record<string, UnitData> = {
     isUnit: false,
     requires: ['SupplyDepot']
   },
+  // Protoss
+  Probe: {
+    name: 'Probe',
+    mineralCost: 50,
+    vespeneCost: 0,
+    supplyCost: 1,
+    buildTime: secondsToFrames(17),
+    isWorker: true,
+    isStructure: false,
+    isUnit: false
+  },
+  Nexus: {
+    name: 'Nexus',
+    mineralCost: 400,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(71),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false
+  },
+  Pylon: {
+    name: 'Pylon',
+    mineralCost: 100,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(18),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false
+  },
+  // Zerg
+  Drone: {
+    name: 'Drone',
+    mineralCost: 50,
+    vespeneCost: 0,
+    supplyCost: 1,
+    buildTime: secondsToFrames(17),
+    isWorker: true,
+    isStructure: false,
+    isUnit: false
+  },
+  Hatchery: {
+    name: 'Hatchery',
+    mineralCost: 300,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(71),
+    isWorker: false,
+    isStructure: true,
+    isUnit: false
+  },
+  Overlord: {
+    name: 'Overlord',
+    mineralCost: 100,
+    vespeneCost: 0,
+    supplyCost: 0,
+    buildTime: secondsToFrames(18),
+    isWorker: false,
+    isStructure: false,
+    isUnit: true
+  },
   // Add more units as needed
 };

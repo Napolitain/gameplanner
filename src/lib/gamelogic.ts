@@ -184,11 +184,21 @@ export class GameLogic {
       this.frame++;
     }
     
+    // Recalculate idle/busy sets after executing build order
+    this.updateUnits();
+    
     // Check if build order is complete
     if (this.boIndex >= this.buildOrder.length) {
       // Wait for all units to be idle
       while (this.busyUnits.size > 0 && this.frame < maxFrames) {
+        this.updateIncome();
         this.updateUnits();
+        
+        // Record history
+        if (this.frame % 22 === 0) {
+          this.recordHistory();
+        }
+        
         this.frame++;
       }
     }
@@ -227,10 +237,15 @@ export class GameLogic {
       unit.update(this.frame);
       
       // Update idle/busy sets
+      // A unit is busy if it has any tasks running
+      if (unit.isBusy()) {
+        this.busyUnits.add(unit);
+      }
+      
+      // A unit is idle if it can accept new tasks
+      // Note: Zerg hatcheries with larva can be both idle AND busy
       if (unit.isIdle()) {
         this.idleUnits.add(unit);
-      } else {
-        this.busyUnits.add(unit);
       }
       
       // Check for completed tasks
@@ -278,7 +293,7 @@ export class GameLogic {
     if (task.newWorker) {
       const worker = new Unit(task.newWorker, this.nextUnitId++);
       this.units.add(worker);
-      this.supplyUsed++;
+      // Note: Supply was already reserved when task was queued
       this.workersMinerals++;
     }
     
@@ -286,7 +301,7 @@ export class GameLogic {
     if (task.newUnit) {
       const newUnit = new Unit(task.newUnit, this.nextUnitId++);
       this.units.add(newUnit);
-      this.supplyUsed += UNIT_DATA[task.newUnit]?.supplyCost || 0;
+      // Note: Supply was already reserved when task was queued
       
       // Special case: Queen starts with different energy
       if (task.newUnit === 'Queen') {
@@ -418,6 +433,12 @@ export class GameLogic {
     this.minerals -= unitData.mineralCost;
     this.vespene -= unitData.vespeneCost;
     
+    // Reserve supply immediately (will be consumed when unit spawns)
+    // Note: Supply is "used" when queued, not when completed
+    if (unitData.supplyCost > 0) {
+      this.supplyUsed += unitData.supplyCost;
+    }
+    
     // Create task
     const buildFrames = Math.floor(unitData.buildTime);
     const taskResult: {
@@ -439,7 +460,15 @@ export class GameLogic {
     );
     
     // Add task to trainer
-    firstIdle.addTask(task);
+    // For Zerg units trained from larva, use background tasks
+    // This applies to all Zerg units (workers, combat units, etc.) trained from larva
+    const useBackgroundTask = firstIdle.larvaCount > 0;
+    if (useBackgroundTask) {
+      firstIdle.useLarva();
+      firstIdle.addTask(task, false, true);
+    } else {
+      firstIdle.addTask(task);
+    }
     
     return true;
   }
