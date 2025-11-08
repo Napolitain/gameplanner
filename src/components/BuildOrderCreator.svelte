@@ -1,7 +1,15 @@
 <script lang="ts">
   import type { Game, GameItem } from '../lib/game';
-  import { createBuildOrder, addStep, removeStep, clearBuildOrder, totalTime } from '../lib/buildOrder';
-  import type { BuildOrder } from '../lib/buildOrder';
+  import { 
+    createBuildOrder, 
+    addStep, 
+    removeStep, 
+    clearBuildOrder, 
+    totalTime, 
+    validateBuildOrder,
+    getResourceSummary 
+  } from '../lib/buildOrder';
+  import type { BuildOrder, ValidationResult } from '../lib/buildOrder';
   import ActionBlocks from './ActionBlocks.svelte';
   import StarCraft2Simulator from './StarCraft2Simulator.svelte';
 
@@ -9,20 +17,31 @@
 
   let buildOrderName: string = 'My Build Order';
   let buildOrder: BuildOrder = createBuildOrder(buildOrderName);
+  let validationResult: ValidationResult | null = null;
+  let showValidation = false;
 
   function handleAddAction(item: GameItem) {
     addStep(buildOrder, item);
     buildOrder = buildOrder; // Trigger reactivity
+    // Auto-validate after adding
+    if (showValidation) {
+      validationResult = validateBuildOrder(buildOrder);
+    }
   }
 
   function handleRemoveStep(index: number) {
     removeStep(buildOrder, index);
     buildOrder = buildOrder; // Trigger reactivity
+    // Auto-validate after removing
+    if (showValidation) {
+      validationResult = validateBuildOrder(buildOrder);
+    }
   }
 
   function handleClear() {
     clearBuildOrder(buildOrder);
     buildOrder = buildOrder; // Trigger reactivity
+    validationResult = null;
   }
 
   function handleNameChange(e: Event) {
@@ -30,6 +49,26 @@
     buildOrderName = target.value;
     buildOrder.name = buildOrderName;
   }
+
+  function handleValidate() {
+    validationResult = validateBuildOrder(buildOrder);
+    showValidation = true;
+  }
+
+  function toggleValidation() {
+    showValidation = !showValidation;
+    if (showValidation) {
+      validationResult = validateBuildOrder(buildOrder);
+    }
+  }
+
+  // Reactive statement to update validation when needed
+  $: if (showValidation && buildOrder) {
+    validationResult = validateBuildOrder(buildOrder);
+  }
+
+  // Get resource summary
+  $: resourceSummary = getResourceSummary(buildOrder);
 </script>
 
 <div class="space-y-6">
@@ -83,11 +122,69 @@
               </li>
             {/each}
           </ol>
-          <div class="mt-4 pt-4 border-t border-gray-300">
+          <div class="mt-4 pt-4 border-t border-gray-300 space-y-2">
             <p class="text-sm font-medium text-gray-700">
               Total time: <span class="text-blue-600">{totalTime(buildOrder).toFixed(1)}</span> units
             </p>
+            
+            {#if resourceSummary.size > 0}
+              <div class="text-sm text-gray-700">
+                <span class="font-medium">Resources:</span>
+                {#each Array.from(resourceSummary.entries()) as [name, amount]}
+                  <span class="ml-2 text-blue-600">{name}: {amount.toFixed(0)}</span>
+                {/each}
+              </div>
+            {/if}
+            
+            <div class="flex gap-2 mt-3">
+              <button
+                on:click={toggleValidation}
+                class="px-4 py-2 {showValidation ? 'bg-blue-600' : 'bg-blue-500'} text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+              >
+                {showValidation ? 'Hide Validation' : 'Validate Build Order'}
+              </button>
+            </div>
           </div>
+        </div>
+      {/if}
+      
+      {#if showValidation && validationResult}
+        <div class="mt-4 space-y-2">
+          {#if validationResult.isValid && validationResult.warnings.length === 0}
+            <div class="bg-green-50 border border-green-200 rounded-md p-3">
+              <p class="text-sm text-green-800 font-medium">✓ Build order is valid with no warnings</p>
+            </div>
+          {/if}
+          
+          {#if validationResult.errors.length > 0}
+            <div class="bg-red-50 border border-red-200 rounded-md p-3">
+              <p class="text-sm font-medium text-red-800 mb-2">Errors:</p>
+              <ul class="space-y-1">
+                {#each validationResult.errors as error}
+                  <li class="text-sm text-red-700">
+                    Step {error.stepNumber} ({error.item.name}): {error.message}
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+          
+          {#if validationResult.warnings.length > 0}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <p class="text-sm font-medium text-yellow-800 mb-2">Warnings:</p>
+              <ul class="space-y-1">
+                {#each validationResult.warnings as warning}
+                  <li class="text-sm text-yellow-700">
+                    {#if warning.stepNumber === 0}
+                      {warning.message}
+                    {:else}
+                      Step {warning.stepNumber} ({warning.item.name}): {warning.message}
+                    {/if}
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
         </div>
       {/if}
     </div>
