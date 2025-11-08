@@ -315,6 +315,11 @@ export class GameLogic {
         const secondZergling = new Unit(task.newUnit, this.nextUnitId++);
         this.units.add(secondZergling);
       }
+      
+      // Special case: Overlord provides supply (Zerg supply unit)
+      if (task.newUnit === 'Overlord') {
+        this.supplyCap += 8;
+      }
     }
     
     // Spawn structure
@@ -326,8 +331,7 @@ export class GameLogic {
       
       // Update supply cap for supply structures
       if (task.newStructure.includes('Depot') || 
-          task.newStructure.includes('Pylon') ||
-          task.newStructure.includes('Overlord')) {
+          task.newStructure.includes('Pylon')) {
         this.supplyCap += 8; // Most supply structures add 8
       }
     }
@@ -395,6 +399,10 @@ export class GameLogic {
       return false;
     }
     
+    // Clear previous requirements
+    this.requirements = [];
+    this.errorMessage = '';
+    
     // Check requirements
     if (unitData.requires) {
       for (const req of unitData.requires) {
@@ -414,6 +422,10 @@ export class GameLogic {
       return false;
     }
     if (unitData.supplyCost > 0 && this.supplyLeft < unitData.supplyCost) {
+      // Track supply requirement for optimization
+      const supplyStructure = RACE_STARTING_DATA[this.race].supplyStructure;
+      this.requirements = [supplyStructure];
+      this.errorMessage = `Supply blocked: need ${supplyStructure}`;
       return false;
     }
     

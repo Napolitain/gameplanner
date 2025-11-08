@@ -8,6 +8,8 @@
 export { GameLogic } from './gamelogic';
 export type { BuildOrderItem } from './gamelogic';
 
+export { OptimizeLogic } from './optimize';
+
 export { Unit } from './unit';
 export { Task } from './task';
 export { Event } from './event';
