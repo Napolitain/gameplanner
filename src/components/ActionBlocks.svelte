@@ -1,18 +1,73 @@
 <script lang="ts">
   import type { Game, GameItem } from '../lib/game';
+  import type { BuildOrder } from '../lib/buildOrder';
+  import { UNIT_DATA } from '../lib/constants';
 
   export let game: Game;
+  export let buildOrder: BuildOrder;
   export let onActionClick: (item: GameItem) => void;
 
-  // Group items by category
+  // Helper function to convert item name to UNIT_DATA key
+  function getUnitDataKey(name: string): string {
+    return name.replace(/\s+/g, '');
+  }
+
+  // Get set of completed structures from build order
+  $: completedStructures = (() => {
+    const structures = new Set<string>();
+    
+    // Add starting structures for Terran
+    structures.add('CommandCenter');
+    
+    // Add structures from build order
+    buildOrder.steps.forEach(step => {
+      const unitKey = getUnitDataKey(step.item.name);
+      const unitData = UNIT_DATA[unitKey];
+      if (unitData && unitData.isStructure) {
+        structures.add(unitKey);
+      }
+    });
+    
+    return structures;
+  })();
+
+  // Check if an item's requirements are met
+  function isItemAvailable(item: GameItem): boolean {
+    // For StarCraft 2, check tech requirements
+    if (game.id !== 'starcraft2') {
+      return true;
+    }
+
+    const unitKey = getUnitDataKey(item.name);
+    const unitData = UNIT_DATA[unitKey];
+    
+    if (!unitData) {
+      // If no unit data, allow it (might be from other games)
+      return true;
+    }
+
+    // Check if all requirements are met
+    if (unitData.requires && unitData.requires.length > 0) {
+      return unitData.requires.every(req => completedStructures.has(req));
+    }
+
+    return true;
+  }
+
+  // Group items by category and filter by availability
   $: categories = (() => {
+    // Explicitly depend on completedStructures for reactivity
+    const _ = completedStructures;
     const cats = new Map<string, GameItem[]>();
     
     game.items.forEach(item => {
-      if (!cats.has(item.category)) {
-        cats.set(item.category, []);
+      // Only include available items
+      if (isItemAvailable(item)) {
+        if (!cats.has(item.category)) {
+          cats.set(item.category, []);
+        }
+        cats.get(item.category)!.push(item);
       }
-      cats.get(item.category)!.push(item);
     });
     
     return Array.from(cats.entries()).sort((a, b) => a[0].localeCompare(b[0]));

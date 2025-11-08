@@ -190,7 +190,7 @@
     </div>
   </div>
 
-  <ActionBlocks game={game} onActionClick={handleAddAction} />
+  <ActionBlocks game={game} buildOrder={buildOrder} onActionClick={handleAddAction} />
 
   {#if game.id === 'starcraft2'}
     <StarCraft2Simulator game={game} buildOrder={buildOrder} />
