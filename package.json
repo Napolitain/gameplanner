@@ -13,7 +13,7 @@
   "license": "MIT",
   "description": "A build order planner for strategy games",
   "devDependencies": {
-    "@astrojs/check": "^0.9.0",
+    "@astrojs/check": "^0.9.6",
     "@astrojs/svelte": "^7.2.2",
     "@astrojs/tailwind": "^6.0.2",
     "astro": "^5.15.4",
